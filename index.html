@@ -5,422 +5,1564 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>S ACCOUNT — ระบบจัดการสำนักงานบัญชี</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+/* ============================================================
+   S ACCOUNT — Redesigned UI
+   Palette: Navy #16213e | Indigo #0f3460 | Violet #7c5cbf
+            Teal #00b4d8 | Emerald #06d6a0 | Amber #ffd166
+            Coral #ef476f | Light #f8faff
+============================================================ */
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --navy:        #16213e;
+  --indigo:      #0f3460;
+  --violet:      #7c5cbf;
+  --violet-dim:  #5a3e9a;
+  --teal:        #00b4d8;
+  --emerald:     #06d6a0;
+  --amber:       #ffd166;
+  --coral:       #ef476f;
+  --bg:          #f0f4ff;
+  --card:        #ffffff;
+  --border:      #e2e8f4;
+  --text:        #16213e;
+  --muted:       #7a86a1;
+  --radius:      12px;
+  --shadow:      0 2px 12px rgba(15,52,96,.08);
+  --shadow-md:   0 8px 32px rgba(15,52,96,.14);
+}
+
+body {
+  font-family: 'IBM Plex Sans Thai', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 14px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+/* ── SIDEBAR ───────────────────────────────────────────── */
+.layout { display: flex; min-height: 100vh; }
+
+.sidebar {
+  width: 220px;
+  background: var(--navy);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  left: 0; top: 0; bottom: 0;
+  z-index: 200;
+  transition: transform .25s ease;
+}
+
+.sidebar-brand {
+  display: flex; align-items: center; gap: 10px;
+  padding: 22px 20px 16px;
+  border-bottom: 1px solid rgba(255,255,255,.08);
+}
+.brand-mark {
+  width: 36px; height: 36px; border-radius: 10px;
+  background: linear-gradient(135deg, var(--violet), var(--teal));
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 800; font-size: 18px; color: #fff;
+  flex-shrink: 0;
+}
+.brand-text { line-height: 1.2; }
+.brand-name { font-weight: 700; font-size: 15px; color: #fff; letter-spacing: .5px; }
+.brand-sub  { font-size: 10px; color: rgba(255,255,255,.4); }
+
+.sidebar-section { padding: 16px 12px 4px; }
+.sidebar-label { font-size: 10px; font-weight: 700; color: rgba(255,255,255,.3); letter-spacing: 1px; text-transform: uppercase; padding: 0 8px; margin-bottom: 4px; }
+
+.nav-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 12px; border-radius: 8px; cursor: pointer;
+  color: rgba(255,255,255,.55); font-size: 13px; font-weight: 500;
+  transition: all .15s; border: none; background: transparent;
+  width: 100%; text-align: left; font-family: inherit;
+  margin-bottom: 2px;
+}
+.nav-item:hover { background: rgba(255,255,255,.07); color: rgba(255,255,255,.85); }
+.nav-item.active { background: var(--violet); color: #fff; }
+.nav-item .nav-icon { font-size: 16px; width: 20px; text-align: center; flex-shrink: 0; }
+.nav-item .nav-badge {
+  margin-left: auto; background: var(--coral); color: #fff;
+  font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 10px;
+}
+
+.sidebar-footer {
+  margin-top: auto;
+  padding: 16px 12px;
+  border-top: 1px solid rgba(255,255,255,.08);
+}
+.db-pill {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 12px; border-radius: 8px;
+  background: rgba(255,255,255,.05);
+  font-size: 12px; color: rgba(255,255,255,.5);
+  cursor: pointer; transition: background .15s;
+}
+.db-pill:hover { background: rgba(255,255,255,.1); }
+.db-dot { width: 7px; height: 7px; border-radius: 50%; background: #4a5568; flex-shrink: 0; }
+.db-dot.on { background: var(--emerald); box-shadow: 0 0 6px var(--emerald); }
+
+/* ── MAIN AREA ─────────────────────────────────────────── */
+.main-area { margin-left: 220px; flex: 1; display: flex; flex-direction: column; min-height: 100vh; }
+
+.topbar {
+  display: flex; align-items: center; gap: 12px;
+  padding: 0 28px; height: 58px;
+  background: var(--card); border-bottom: 1px solid var(--border);
+  position: sticky; top: 0; z-index: 100;
+}
+.topbar-title { font-size: 16px; font-weight: 700; color: var(--navy); }
+.topbar-sub   { font-size: 12px; color: var(--muted); margin-left: 2px; }
+.topbar-right { display: flex; align-items: center; gap: 10px; margin-left: auto; }
+.btn-export {
+  display: flex; align-items: center; gap: 6px;
+  padding: 7px 14px; border-radius: 8px; border: 1.5px solid var(--border);
+  background: #fff; color: var(--text); font-family: inherit; font-size: 12px;
+  font-weight: 600; cursor: pointer; transition: all .15s;
+}
+.btn-export:hover { border-color: var(--violet); color: var(--violet); }
+.btn-add {
+  display: flex; align-items: center; gap: 6px;
+  padding: 7px 16px; border-radius: 8px; border: none;
+  background: var(--violet); color: #fff;
+  font-family: inherit; font-size: 12px; font-weight: 600;
+  cursor: pointer; transition: opacity .15s;
+}
+.btn-add:hover { opacity: .85; }
+
+.page-body { padding: 24px 28px 48px; }
+
+/* ── SECTION ───────────────────────────────────────────── */
+.section { display: none; }
+.section.active { display: block; }
+
+/* ── SUMMARY STRIP ─────────────────────────────────────── */
+.summary-strip {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 14px;
+  margin-bottom: 22px;
+}
+.sum-card {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 16px 18px;
+  box-shadow: var(--shadow);
+  border-top: 3px solid transparent;
+  transition: box-shadow .15s;
+}
+.sum-card:hover { box-shadow: var(--shadow-md); }
+.sum-card.c-total  { border-color: var(--violet); }
+.sum-card.c-pay    { border-color: var(--teal); }
+.sum-card.c-col    { border-color: var(--emerald); }
+.sum-card.c-pend   { border-color: var(--amber); }
+.sum-card.c-done   { border-color: var(--coral); }
+.sum-label { font-size: 11px; color: var(--muted); font-weight: 600; margin-bottom: 6px; }
+.sum-val {
+  font-size: 22px; font-weight: 700; font-family: 'IBM Plex Mono', monospace;
+  color: var(--navy); line-height: 1;
+}
+.sum-val span { font-size: 13px; color: var(--muted); font-weight: 400; }
+.sum-sub { font-size: 11px; color: var(--muted); margin-top: 4px; }
+
+/* ── FILTERS ───────────────────────────────────────────── */
+.filter-bar {
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  background: var(--card); border-radius: var(--radius);
+  padding: 14px 18px; margin-bottom: 16px;
+  box-shadow: var(--shadow);
+}
+.filter-hint {
+  font-size: 11px; color: var(--amber);
+  background: rgba(255,209,102,.12);
+  padding: 4px 10px; border-radius: 6px;
+  border-left: 3px solid var(--amber);
+  width: 100%; margin-bottom: 4px;
+}
+.search-wrap { position: relative; flex: 1; min-width: 180px; }
+.search-wrap input {
+  width: 100%; padding: 8px 12px 8px 34px;
+  border: 1.5px solid var(--border); border-radius: 8px;
+  font-family: inherit; font-size: 13px;
+  background: var(--bg); outline: none; transition: border-color .15s;
+}
+.search-wrap input:focus { border-color: var(--violet); background: #fff; }
+.search-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--muted); font-size: 14px; }
+.select-wrap select {
+  padding: 8px 12px; border: 1.5px solid var(--border); border-radius: 8px;
+  font-family: inherit; font-size: 13px; background: var(--bg);
+  outline: none; cursor: pointer; transition: border-color .15s;
+  appearance: none; padding-right: 28px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%237a86a1'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 10px center;
+}
+.select-wrap select:focus { border-color: var(--violet); background-color: #fff; }
+.filter-spacer { flex: 1; }
+
+/* ── DATA TABLE ────────────────────────────────────────── */
+.table-card { background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
+.table-scroll { overflow-x: auto; }
+.data-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+
+.data-table thead tr { background: var(--navy); }
+.data-table th {
+  padding: 11px 13px; text-align: left;
+  font-weight: 600; font-size: 11px; color: rgba(255,255,255,.7);
+  text-transform: uppercase; letter-spacing: .5px; white-space: nowrap;
+}
+.data-table th.num { text-align: right; }
+.data-table th.center { text-align: center; }
+.data-table .th-group {
+  text-align: center; border-bottom: 1px solid rgba(255,255,255,.1);
+  padding: 6px 13px; font-size: 11px; color: rgba(255,255,255,.5);
+  font-weight: 600;
+}
+.data-table td { padding: 10px 13px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+.data-table td.num { text-align: right; font-family: 'IBM Plex Mono', monospace; font-size: 12px; }
+.data-table td.center { text-align: center; }
+.data-table tbody tr:hover { background: #f8faff; }
+.data-table tbody tr:last-child td { border-bottom: none; }
+
+.row-num { color: var(--muted); font-size: 12px; }
+.cust-name-main { font-weight: 600; font-size: 13px; color: var(--navy); }
+.cust-name-sub  { font-size: 11px; color: var(--muted); font-family: 'IBM Plex Mono', monospace; margin-top: 1px; }
+.dot-new { width: 7px; height: 7px; border-radius: 50%; background: var(--teal); display: inline-block; margin-left: 4px; vertical-align: middle; }
+
+.num-val { color: var(--navy); }
+.num-dash { color: var(--border); }
+.num-col  { color: var(--violet); }
+
+/* Status badges */
+.badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600;
+  white-space: nowrap;
+}
+.badge-filed   { background: rgba(6,214,160,.1);  color: #05a87a; }
+.badge-pending { background: rgba(255,209,102,.15); color: #c8900a; }
+.badge-wait    { background: rgba(0,180,216,.1);  color: #007ea3; }
+.badge::before { content: '●'; font-size: 7px; }
+
+/* Inline payment input */
+.pay-input-wrap { display: flex; align-items: center; gap: 6px; }
+.pay-checkbox { width: 16px; height: 16px; accent-color: var(--violet); cursor: pointer; }
+.pay-inline-input {
+  width: 90px; padding: 4px 8px; border: 1.5px solid var(--violet);
+  border-radius: 6px; font-family: 'IBM Plex Mono', monospace; font-size: 12px;
+  text-align: right; outline: none; display: none;
+}
+.pay-inline-input.show { display: block; }
+
+/* Action buttons */
+.btn-row-del {
+  padding: 4px 8px; border-radius: 6px; border: 1px solid var(--border);
+  background: transparent; cursor: pointer; color: var(--muted); font-size: 13px;
+  transition: all .15s;
+}
+.btn-row-del:hover { border-color: var(--coral); color: var(--coral); background: rgba(239,71,111,.06); }
+
+/* ── PAGINATION ────────────────────────────────────────── */
+.table-footer {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 18px; border-top: 1px solid var(--border);
+  background: var(--card);
+}
+.page-info { font-size: 12px; color: var(--muted); }
+.page-controls { display: flex; align-items: center; gap: 4px; }
+.page-btn {
+  min-width: 32px; height: 32px; border-radius: 7px; border: 1.5px solid var(--border);
+  background: #fff; cursor: pointer; font-family: 'IBM Plex Mono', monospace;
+  font-size: 13px; color: var(--text); display: flex; align-items: center; justify-content: center;
+  transition: all .15s;
+}
+.page-btn:hover:not(:disabled) { border-color: var(--violet); color: var(--violet); }
+.page-btn.active { background: var(--violet); border-color: var(--violet); color: #fff; font-weight: 700; }
+.page-btn:disabled { opacity: .4; cursor: default; }
+.goto-wrap { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--muted); }
+.goto-input {
+  width: 52px; padding: 5px 8px; border: 1.5px solid var(--border); border-radius: 7px;
+  font-family: 'IBM Plex Mono', monospace; font-size: 12px; text-align: center; outline: none;
+}
+.goto-input:focus { border-color: var(--violet); }
+.goto-btn {
+  padding: 5px 10px; border-radius: 7px; border: 1.5px solid var(--border);
+  background: #fff; cursor: pointer; font-size: 12px; font-family: inherit;
+}
+.goto-btn:hover { border-color: var(--violet); color: var(--violet); }
+
+/* ── DASHBOARD ─────────────────────────────────────────── */
+.dash-header { margin-bottom: 24px; }
+.dash-header h1 { font-size: 24px; font-weight: 700; }
+.dash-header p  { color: var(--muted); font-size: 13px; margin-top: 3px; }
+.dash-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px; margin-bottom: 24px;
+}
+.dash-card {
+  background: var(--card); border-radius: var(--radius);
+  padding: 20px; box-shadow: var(--shadow);
+  display: flex; flex-direction: column; gap: 8px;
+}
+.dash-card-icon { font-size: 22px; margin-bottom: 4px; }
+.dash-card-num { font-size: 30px; font-weight: 700; font-family: 'IBM Plex Mono', monospace; color: var(--navy); }
+.dash-card-label { font-size: 12px; color: var(--muted); font-weight: 500; }
+.dash-card.dc-purple { border-left: 4px solid var(--violet); }
+.dash-card.dc-teal   { border-left: 4px solid var(--teal); }
+.dash-card.dc-green  { border-left: 4px solid var(--emerald); }
+.dash-card.dc-coral  { border-left: 4px solid var(--coral); }
+
+.quick-actions { display: flex; gap: 12px; margin-bottom: 24px; flex-wrap: wrap; }
+.quick-btn {
+  display: flex; align-items: center; gap: 8px;
+  padding: 12px 20px; border-radius: var(--radius);
+  border: none; cursor: pointer; font-family: inherit; font-size: 13px; font-weight: 600;
+  transition: all .15s; color: #fff;
+}
+.qb-violet { background: var(--violet); }
+.qb-teal   { background: var(--teal); color: var(--navy); }
+.qb-green  { background: var(--emerald); color: var(--navy); }
+.quick-btn:hover { filter: brightness(1.1); transform: translateY(-1px); box-shadow: var(--shadow-md); }
+
+/* Customer list in dashboard */
+.cust-search-bar {
+  display: flex; align-items: center; gap: 10px;
+  background: var(--card); border-radius: var(--radius);
+  padding: 14px 18px; box-shadow: var(--shadow); margin-bottom: 14px;
+}
+.type-tabs { display: flex; gap: 6px; }
+.type-tab {
+  padding: 6px 14px; border-radius: 8px; border: 1.5px solid var(--border);
+  background: #fff; cursor: pointer; font-size: 12px; font-family: inherit;
+  color: var(--text); font-weight: 600; transition: all .15s; white-space: nowrap;
+}
+.type-tab.active { border-color: var(--violet); background: var(--violet); color: #fff; }
+.btn-add-cust {
+  width: 34px; height: 34px; border-radius: 8px;
+  background: var(--emerald); border: none; color: var(--navy);
+  font-size: 20px; font-weight: 300; cursor: pointer; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  transition: filter .15s;
+}
+.btn-add-cust:hover { filter: brightness(1.1); }
+
+.cust-grid { display: flex; flex-direction: column; gap: 8px; }
+.cust-card {
+  background: var(--card); border-radius: var(--radius);
+  padding: 14px 18px; box-shadow: var(--shadow);
+  display: flex; align-items: center; gap: 14px;
+  cursor: pointer; transition: all .15s;
+  border-left: 4px solid transparent;
+}
+.cust-card:hover { border-left-color: var(--violet); box-shadow: var(--shadow-md); transform: translateX(2px); }
+.code-badge {
+  background: linear-gradient(135deg, rgba(124,92,191,.1), rgba(0,180,216,.08));
+  color: var(--violet); border: 1px solid rgba(124,92,191,.2);
+  padding: 5px 11px; border-radius: 8px; font-weight: 700;
+  font-size: 12px; font-family: 'IBM Plex Mono', monospace; white-space: nowrap;
+}
+.cust-info { flex: 1; min-width: 0; }
+.cust-main { font-weight: 600; font-size: 13px; color: var(--navy); }
+.cust-taxid { font-size: 11px; color: var(--muted); font-family: 'IBM Plex Mono', monospace; }
+.cust-type-tag {
+  font-size: 11px; padding: 2px 8px; border-radius: 6px;
+  background: rgba(0,180,216,.1); color: var(--teal); font-weight: 600;
+}
+.cust-actions { display: flex; gap: 5px; }
+.btn-icon-sm {
+  width: 28px; height: 28px; border-radius: 6px; border: 1px solid var(--border);
+  background: transparent; cursor: pointer; display: flex; align-items: center;
+  justify-content: center; font-size: 12px; color: var(--muted); transition: all .15s;
+}
+.btn-icon-sm:hover { border-color: var(--violet); color: var(--violet); }
+
+/* ── TRACKING TABLE ────────────────────────────────────── */
+.track-cell {
+  width: 30px; height: 30px; border-radius: 6px;
+  border: 1.5px solid var(--border); cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; transition: all .15s; margin: auto;
+}
+.track-cell:hover { border-color: var(--teal); }
+.track-cell.done { background: rgba(6,214,160,.12); border-color: var(--emerald); color: var(--emerald); }
+
+/* ── MODALS ────────────────────────────────────────────── */
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(10,15,30,.5);
+  display: none; align-items: center; justify-content: center;
+  z-index: 500; backdrop-filter: blur(4px);
+}
+.modal-overlay.open { display: flex; }
+.modal {
+  background: var(--card); border-radius: 16px; width: 100%;
+  max-width: 540px; max-height: 90vh; overflow-y: auto;
+  box-shadow: 0 24px 64px rgba(0,0,0,.3);
+  animation: modalIn .2s ease;
+}
+.modal-wide { max-width: 780px; }
+@keyframes modalIn {
+  from { transform: translateY(12px) scale(.98); opacity: 0; }
+  to   { transform: none; opacity: 1; }
+}
+.modal-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 20px 24px 16px; border-bottom: 1px solid var(--border);
+}
+.modal-header h3 { font-size: 16px; font-weight: 700; color: var(--navy); }
+.modal-close {
+  width: 30px; height: 30px; border-radius: 50%; border: none;
+  background: var(--bg); color: var(--muted); cursor: pointer;
+  font-size: 16px; display: flex; align-items: center; justify-content: center;
+}
+.modal-close:hover { background: var(--border); }
+.modal-body { padding: 20px 24px; }
+.modal-footer {
+  display: flex; gap: 10px; justify-content: flex-end;
+  padding: 16px 24px 20px; border-top: 1px solid var(--border);
+}
+
+.form-section { font-size: 11px; font-weight: 700; color: var(--violet); letter-spacing: .5px;
+  text-transform: uppercase; margin: 14px 0 8px;
+  padding-bottom: 6px; border-bottom: 1px solid rgba(124,92,191,.15); }
+.form-row { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 12px; }
+.form-group { display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 130px; }
+.form-group label { font-size: 11px; font-weight: 600; color: var(--muted); }
+.form-input {
+  padding: 8px 12px; border: 1.5px solid var(--border); border-radius: 8px;
+  font-family: inherit; font-size: 13px; background: var(--bg);
+  outline: none; transition: all .15s; width: 100%; color: var(--text);
+}
+.form-input:focus { border-color: var(--violet); background: #fff; }
+
+.btn-primary {
+  padding: 9px 20px; border-radius: 9px; border: none;
+  background: var(--violet); color: #fff; cursor: pointer;
+  font-family: inherit; font-weight: 600; font-size: 13px;
+  transition: opacity .15s;
+}
+.btn-primary:hover { opacity: .85; }
+.btn-secondary {
+  padding: 9px 20px; border-radius: 9px; border: 1.5px solid var(--border);
+  background: #fff; color: var(--text); cursor: pointer;
+  font-family: inherit; font-weight: 500; font-size: 13px;
+}
+
+/* ── TOAST ─────────────────────────────────────────────── */
+.toast {
+  position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%) translateY(80px);
+  background: var(--navy); color: #fff; padding: 11px 24px;
+  border-radius: 100px; font-size: 13px; font-weight: 600;
+  box-shadow: 0 8px 30px rgba(0,0,0,.25); transition: transform .3s cubic-bezier(.34,1.56,.64,1);
+  z-index: 9999; pointer-events: none;
+}
+.toast.show  { transform: translateX(-50%) translateY(0); }
+.toast.ok    { background: var(--emerald); color: var(--navy); }
+.toast.err   { background: var(--coral); }
+
+/* ── EMPTY ─────────────────────────────────────────────── */
+.empty-state { text-align: center; padding: 48px 24px; color: var(--muted); }
+.empty-state .icon { font-size: 36px; margin-bottom: 12px; }
+.empty-state p { font-size: 13px; }
+
+/* ── SCROLLBAR ─────────────────────────────────────────── */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+
+/* ── RESPONSIVE ────────────────────────────────────────── */
+@media (max-width: 900px) {
+  .sidebar { transform: translateX(-220px); }
+  .sidebar.open { transform: translateX(0); }
+  .main-area { margin-left: 0; }
+  .summary-strip { grid-template-columns: repeat(2, 1fr); }
+  .dash-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 600px) {
+  .summary-strip { grid-template-columns: 1fr 1fr; }
+  .page-body { padding: 16px; }
+}
+
+/* Section header */
+.sec-header { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-bottom: 20px; }
+.sec-header h2 { font-size: 20px; font-weight: 700; }
+  </style>
 </head>
 <body>
-  <div id="app">
+<div class="layout">
+
+  <!-- ── SIDEBAR ── -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-mark">S</div>
+      <div class="brand-text">
+        <div class="brand-name">S ACCOUNT</div>
+        <div class="brand-sub">สำนักงานบัญชี</div>
+      </div>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-label">ภาพรวม</div>
+      <button class="nav-item active" data-section="dashboard">
+        <span class="nav-icon">🏠</span> Dashboard
+      </button>
+      <button class="nav-item" data-section="customer-list">
+        <span class="nav-icon">👥</span> ลูกค้าทั้งหมด
+      </button>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-label">ภาษี & เอกสาร</div>
+      <button class="nav-item" data-section="wht">
+        <span class="nav-icon">🧾</span> หักภาษี ณ ที่จ่าย
+        <span class="nav-badge" id="navBadgeWHT">—</span>
+      </button>
+      <button class="nav-item" data-section="vat">
+        <span class="nav-icon">📊</span> ภ.พ.30 / VAT
+      </button>
+      <button class="nav-item" data-section="tracking">
+        <span class="nav-icon">📋</span> ติดตามเอกสาร
+      </button>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-label">การเงิน</div>
+      <button class="nav-item" data-section="fees">
+        <span class="nav-icon">💰</span> ค่าบริการ
+      </button>
+    </div>
+
+    <div class="sidebar-footer">
+      <div class="db-pill" id="dbPill" onclick="openModal('modalConfig')">
+        <div class="db-dot" id="dbDot"></div>
+        <span id="dbLabel">ไม่ได้เชื่อมต่อ · ตั้งค่า DB</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ── MAIN AREA ── -->
+  <div class="main-area">
+
     <!-- TOP BAR -->
     <header class="topbar">
-      <div class="topbar-brand">
-        <span class="brand-mark">S</span>
-        <span class="brand-name">ACCOUNT</span>
+      <div>
+        <div class="topbar-title" id="topbarTitle">Dashboard</div>
+        <div class="topbar-sub" id="topbarSub">ภาพรวมระบบบัญชี</div>
       </div>
-      <nav class="topbar-nav">
-        <button class="nav-btn active" data-section="dashboard">Dashboard</button>
-        <button class="nav-btn" data-section="customer-list">ลูกค้า</button>
-        <button class="nav-btn" data-section="tracking">ติดตามเอกสาร</button>
-        <button class="nav-btn" data-section="tax">ภาษี</button>
-        <button class="nav-btn" data-section="vat">ภ.พ.30</button>
-        <button class="nav-btn" data-section="fees">ค่าบริการ</button>
-      </nav>
       <div class="topbar-right">
-        <span class="db-status" id="dbStatus">● ไม่ได้เชื่อมต่อ</span>
-        <button class="btn-config" id="btnConfig">⚙ ตั้งค่า DB</button>
+        <button class="btn-export" id="btnExportCSV" style="display:none">⬇ ส่งออก CSV</button>
+        <button class="btn-add" id="btnTopAdd" style="display:none">＋ เพิ่มรายการ</button>
       </div>
     </header>
 
-    <!-- MAIN CONTENT -->
-    <main class="main-content">
+    <div class="page-body">
 
-      <!-- ───────────────── DASHBOARD ───────────────── -->
-      <section id="sec-dashboard" class="section active">
-        <div class="dash-hero">
-          <div class="dash-title">
-            <h1>สำนักงานบัญชี</h1>
-            <p class="dash-subtitle">ระบบบันทึกและติดตามงานบัญชี · ภาษี · เอกสาร</p>
+      <!-- ═══════════════ DASHBOARD ═══════════════ -->
+      <section class="section active" id="sec-dashboard">
+        <div class="dash-header">
+          <h1>สวัสดี, สำนักงานบัญชี 👋</h1>
+          <p>ระบบบันทึกและติดตามงานบัญชี · ภาษี · เอกสาร</p>
+        </div>
+
+        <div class="dash-grid">
+          <div class="dash-card dc-purple">
+            <div class="dash-card-icon">👥</div>
+            <div class="dash-card-num" id="dashStatCust">—</div>
+            <div class="dash-card-label">ลูกค้าทั้งหมด</div>
           </div>
-          <div class="dash-stats" id="dashStats">
-            <div class="stat-card stat-blue">
-              <span class="stat-num" id="statCustomers">—</span>
-              <span class="stat-label">ลูกค้าทั้งหมด</span>
-            </div>
-            <div class="stat-card stat-purple">
-              <span class="stat-num" id="statWHT">—</span>
-              <span class="stat-label">ภาษีหัก ณ ที่จ่าย</span>
-            </div>
-            <div class="stat-card stat-green">
-              <span class="stat-num" id="statVAT">—</span>
-              <span class="stat-label">ภ.พ.30 เดือนนี้</span>
-            </div>
-            <div class="stat-card stat-salmon">
-              <span class="stat-num" id="statFees">—</span>
-              <span class="stat-label">ค่าบริการค้างชำระ</span>
-            </div>
+          <div class="dash-card dc-teal">
+            <div class="dash-card-icon">🧾</div>
+            <div class="dash-card-num" id="dashStatWHT">—</div>
+            <div class="dash-card-label">ภาษีหัก ณ ที่จ่าย</div>
+          </div>
+          <div class="dash-card dc-green">
+            <div class="dash-card-icon">📊</div>
+            <div class="dash-card-num" id="dashStatVAT">—</div>
+            <div class="dash-card-label">ภ.พ.30 เดือนนี้</div>
+          </div>
+          <div class="dash-card dc-coral">
+            <div class="dash-card-icon">⚠️</div>
+            <div class="dash-card-num" id="dashStatFees">—</div>
+            <div class="dash-card-label">ค่าบริการค้างชำระ</div>
           </div>
         </div>
 
-        <!-- Quick access tabs (image 2 style) -->
-        <div class="quick-menu">
-          <div class="quick-left">
-            <div class="quick-label">ตามเอกสาร</div>
-            <ul class="quick-list">
-              <li>ภาษีรายเดือน</li>
-              <li>ประกันสังคม</li>
-              <li>หัก ณ ที่จ่าย</li>
-            </ul>
-          </div>
-          <button class="quick-btn btn-purple" onclick="goSection('tracking')">รับ-จ่าย</button>
-          <button class="quick-btn btn-purple" onclick="goSection('tax')">ภาษี</button>
-          <button class="quick-btn btn-purple" onclick="goSection('fees')">ค่าบริการ</button>
+        <div class="quick-actions">
+          <button class="quick-btn qb-violet" onclick="goSection('wht')">🧾 บันทึกภาษีหัก ณ ที่จ่าย</button>
+          <button class="quick-btn qb-teal"   onclick="goSection('vat')">📊 บันทึก ภ.พ.30</button>
+          <button class="quick-btn qb-green"  onclick="goSection('fees')">💰 บันทึกค่าบริการ</button>
+          <button class="quick-btn" style="background:var(--indigo);color:#fff;" onclick="goSection('tracking')">📋 ติดตามเอกสาร</button>
         </div>
 
-        <!-- Customer search strip -->
-        <div class="customer-search-strip">
+        <!-- Customer search & list -->
+        <div class="cust-search-bar">
           <div class="type-tabs">
-            <button class="type-tab active" data-type="">ลูกค้า<br/><small>รหัส 1</small></button>
-            <button class="type-tab" data-type="บริษัท">บริษัท<br/><small>รหัส 2</small></button>
-            <button class="type-tab" data-type="หจก">หจก<br/><small>รหัส 3</small></button>
+            <button class="type-tab active" data-type="">ทั้งหมด</button>
+            <button class="type-tab" data-type="บริษัท">บริษัท</button>
+            <button class="type-tab" data-type="หจก">หจก</button>
+            <button class="type-tab" data-type="ลูกค้า">ลูกค้า</button>
           </div>
-          <div class="search-row">
-            <button class="btn-add-customer" id="btnAddCustomer">+</button>
-            <div class="search-box-wrap">
-              <input type="text" id="searchInput" placeholder="ค้นหา รหัส / ชื่อ ได้" class="search-input" />
+          <button class="btn-add-cust" onclick="openModal('modalAddCustomer')" title="เพิ่มลูกค้า">＋</button>
+          <div class="search-wrap" style="max-width:260px">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="searchInput" placeholder="ค้นหา รหัส / ชื่อ / เลขภาษี" />
+          </div>
+        </div>
+        <div class="cust-grid" id="customerList">
+          <div class="empty-state"><div class="icon">🔌</div><p>กรุณาตั้งค่าการเชื่อมต่อ Supabase ก่อน</p></div>
+        </div>
+      </section>
+
+      <!-- ═══════════════ CUSTOMER LIST ═══════════════ -->
+      <section class="section" id="sec-customer-list">
+        <div class="sec-header">
+          <h2>รายการลูกค้าทั้งหมด</h2>
+          <button class="btn-add" onclick="openModal('modalAddCustomer')">＋ เพิ่มลูกค้าใหม่</button>
+        </div>
+        <div class="table-card">
+          <div class="table-scroll">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>#</th><th>รหัส</th><th>เลขทะเบียนภาษี</th><th>ชื่อ</th><th>ประเภท</th><th class="center">สถานะ</th><th></th>
+                </tr>
+              </thead>
+              <tbody id="tblCustomersBody">
+                <tr><td colspan="7" class="empty-td" style="text-align:center;padding:32px;color:var(--muted)">ยังไม่มีข้อมูล</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══════════════ WHT ═══════════════ -->
+      <section class="section" id="sec-wht">
+        <div class="sec-header">
+          <h2>บันทึกภาษีหัก ณ ที่จ่าย</h2>
+          <span id="whtMonthLabel" style="font-size:13px;color:var(--muted);font-weight:500"></span>
+        </div>
+
+        <!-- Summary strip -->
+        <div class="summary-strip" id="whtSummary">
+          <div class="sum-card c-total">
+            <div class="sum-label">ยอดรวมทั้งหมด</div>
+            <div class="sum-val" id="sumTotal">—<span> บ</span></div>
+            <div class="sum-sub">ทุกแบบ · ทุกบริษัท</div>
+          </div>
+          <div class="sum-card c-pay">
+            <div class="sum-label">เราจ่าย (รวม)</div>
+            <div class="sum-val" id="sumPay">—<span> บ</span></div>
+            <div class="sum-sub">ภ.ง.ด.1+3+53</div>
+          </div>
+          <div class="sum-card c-col">
+            <div class="sum-label">เก็บลูกค้า (รวม)</div>
+            <div class="sum-val" id="sumCol">—<span> บ</span></div>
+            <div class="sum-sub">รวมยื่นเพิ่มเติม</div>
+          </div>
+          <div class="sum-card c-pend">
+            <div class="sum-label">รอชำระ</div>
+            <div class="sum-val" id="sumPend">—<span> บ</span></div>
+            <div class="sum-sub" id="sumPendSub">— บริษัท</div>
+          </div>
+          <div class="sum-card c-done">
+            <div class="sum-label">ชำระแล้ว</div>
+            <div class="sum-val" id="sumDone">—<span> บ</span></div>
+            <div class="sum-sub" id="sumDoneSub">— บริษัท</div>
+          </div>
+        </div>
+
+        <!-- Filter bar -->
+        <div class="filter-bar">
+          <div class="filter-hint" id="whtHint">💡 คลิกที่ตัวเลขหรือชื่อในตารางเพื่อแก้ไขได้เลย · คลิกสถานะเพื่อเปลี่ยน · Enter หรือ Tab เพื่อยืนยัน</div>
+          <div class="search-wrap">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="whtSearch" placeholder="ค้นหาชื่อบริษัท หรือเลขภาษี..." />
+          </div>
+          <div class="select-wrap"><select id="whtStatusFilter">
+            <option value="">สถานะทั้งหมด</option>
+            <option value="filed">ยื่นแล้ว</option>
+            <option value="pending">ยื่นแล้วรอชำระ</option>
+            <option value="wait">รอดำเนินการ</option>
+          </select></div>
+          <div class="select-wrap"><select id="whtTypeFilter">
+            <option value="">ทุกประเภทแบบ</option>
+            <option value="pnd1">ภ.ง.ด.1</option>
+            <option value="pnd3">ภ.ง.ด.3</option>
+            <option value="pnd53">ภ.ง.ด.53</option>
+          </select></div>
+          <div class="select-wrap"><select id="whtPerPage">
+            <option value="50">50 / หน้า</option>
+            <option value="100">100 / หน้า</option>
+            <option value="200">200 / หน้า</option>
+          </select></div>
+          <div class="filter-spacer"></div>
+          <button class="btn-export" onclick="exportWHT()">⬇ ส่งออก CSV</button>
+          <button class="btn-add" onclick="openModal('modalAddWHT')">＋ เพิ่มแถว</button>
+        </div>
+
+        <!-- Table -->
+        <div class="table-card">
+          <div class="table-scroll">
+            <table class="data-table" id="tblWHT">
+              <thead>
+                <tr>
+                  <th rowspan="2">#</th>
+                  <th rowspan="2">ลูกค้า / เลขภาษี</th>
+                  <th colspan="2" class="th-group">ภ.ง.ด.1</th>
+                  <th colspan="2" class="th-group">ภ.ง.ด.3</th>
+                  <th colspan="2" class="th-group">ภ.ง.ด.53</th>
+                  <th colspan="2" class="th-group">รวม</th>
+                  <th rowspan="2" class="center">สถานะ</th>
+                  <th rowspan="2">ยื่นเพิ่มเติม</th>
+                  <th rowspan="2"></th>
+                </tr>
+                <tr>
+                  <th class="num">เราจ่าย</th><th class="num">เก็บ</th>
+                  <th class="num">เราจ่าย</th><th class="num">เก็บ</th>
+                  <th class="num">เราจ่าย</th><th class="num">เก็บ</th>
+                  <th class="num">เราจ่าย</th><th class="num">เก็บ</th>
+                </tr>
+              </thead>
+              <tbody id="tblWHTBody">
+                <tr><td colspan="13" class="empty-td" style="text-align:center;padding:40px;color:var(--muted)">ยังไม่มีข้อมูล</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="table-footer">
+            <div class="page-info" id="whtPageInfo">— รายการ</div>
+            <div class="page-controls" id="whtPageControls"></div>
+            <div class="goto-wrap">
+              ไปหน้า <input type="number" class="goto-input" id="whtGotoInput" min="1" />
+              <button class="goto-btn" onclick="whtGotoPage()">ไป</button>
             </div>
           </div>
         </div>
-
-        <!-- Customer list -->
-        <div class="customer-list" id="customerList">
-          <div class="empty-msg">กรุณาตั้งค่าการเชื่อมต่อ Supabase ก่อน</div>
-        </div>
       </section>
 
-      <!-- ───────────────── CUSTOMER LIST (full page) ───────────────── -->
-      <section id="sec-customer-list" class="section">
-        <div class="section-header">
-          <h2>รายการลูกค้าทั้งหมด</h2>
-          <button class="btn-primary" onclick="openModal('modalAddCustomer')">+ เพิ่มลูกค้าใหม่</button>
-        </div>
-        <div class="table-wrap">
-          <table class="data-table" id="tblCustomers">
-            <thead>
-              <tr>
-                <th>รหัส</th><th>เลขทะเบียน</th><th>ชื่อ</th>
-                <th>ประเภท</th><th>สถานะ</th><th></th>
-              </tr>
-            </thead>
-            <tbody id="tblCustomersBody">
-              <tr><td colspan="6" class="empty-td">ยังไม่มีข้อมูล</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </section>
-
-      <!-- ───────────────── DOCUMENT TRACKING ───────────────── -->
-      <section id="sec-tracking" class="section">
-        <div class="section-header">
-          <h2>ติดตามเอกสาร</h2>
-          <div class="filter-row">
-            <select id="trackingCustomerFilter" class="select-input">
-              <option value="">— เลือกลูกค้า —</option>
-            </select>
-          </div>
-        </div>
-        <div class="table-wrap table-scroll-x">
-          <table class="data-table tracking-table" id="tblTracking">
-            <thead>
-              <tr>
-                <th class="sticky-col">รหัส / ชื่อ</th>
-                <th>13.8.68</th><th>14.8.68</th><th>15.8.68</th>
-                <th>18.8.68</th><th>19.8.68</th>
-                <th>16.9.68</th><th>17.9.68</th><th>18.9.68</th><th>22.9.68</th>
-                <th>14/10</th><th>17/10</th><th>20/10</th>
-                <th>17.11</th>
-                <th>9.12</th><th>12.12</th>
-                <th>16.1.69</th><th>20.1.69</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody id="tblTrackingBody">
-              <tr><td colspan="18" class="empty-td">ยังไม่มีข้อมูล</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </section>
-
-      <!-- ───────────────── WITHHOLDING TAX ───────────────── -->
-      <section id="sec-tax" class="section">
-        <div class="section-header">
-          <h2>ภาษีหัก ณ ที่จ่าย</h2>
-          <div class="filter-row">
-            <select id="taxCustomerFilter" class="select-input"><option value="">— ลูกค้า —</option></select>
-            <select id="taxYearFilter" class="select-input">
-              <option value="2568">2568</option><option value="2567">2567</option>
-            </select>
-            <select id="taxMonthFilter" class="select-input">
-              <option value="">ทุกเดือน</option>
-              <option value="1">มกราคม</option><option value="2">กุมภาพันธ์</option>
-              <option value="3">มีนาคม</option><option value="4">เมษายน</option>
-              <option value="5">พฤษภาคม</option><option value="6">มิถุนายน</option>
-              <option value="7">กรกฎาคม</option><option value="8">สิงหาคม</option>
-              <option value="9">กันยายน</option><option value="10">ตุลาคม</option>
-              <option value="11">พฤศจิกายน</option><option value="12">ธันวาคม</option>
-            </select>
-            <button class="btn-primary" onclick="openModal('modalAddWHT')">+ เพิ่มรายการ</button>
-          </div>
-        </div>
-        <div class="table-wrap">
-          <table class="data-table" id="tblWHT">
-            <thead>
-              <tr>
-                <th>ลูกค้า</th><th>ปี/เดือน</th>
-                <th>ภ.ง.ด.1</th><th>ภ.ง.ด.3 จ่าย</th><th>ภ.ง.ด.3 เก็บ</th>
-                <th>ภ.ง.ด.53 จ่าย</th><th>ภ.ง.ด.53 เก็บ</th><th>วันยื่น</th><th></th>
-              </tr>
-            </thead>
-            <tbody id="tblWHTBody"><tr><td colspan="9" class="empty-td">ยังไม่มีข้อมูล</td></tr></tbody>
-          </table>
-        </div>
-      </section>
-
-      <!-- ───────────────── VAT PP30 ───────────────── -->
-      <section id="sec-vat" class="section">
-        <div class="section-header">
+      <!-- ═══════════════ VAT PP30 ═══════════════ -->
+      <section class="section" id="sec-vat">
+        <div class="sec-header">
           <h2>ภ.พ.30 / VAT</h2>
-          <div class="filter-row">
-            <select id="vatCustomerFilter" class="select-input"><option value="">— ลูกค้า —</option></select>
-            <button class="btn-primary" onclick="openModal('modalAddVAT')">+ เพิ่มรายการ</button>
-          </div>
+          <button class="btn-add" onclick="openModal('modalAddVAT')">＋ เพิ่มรายการ</button>
         </div>
-        <div class="table-wrap">
-          <table class="data-table" id="tblVAT">
-            <thead>
-              <tr>
-                <th>ลูกค้า</th><th>งวด</th><th>ยอดขาย</th><th>ยอดซื้อ</th>
-                <th>ภาษีขาย</th><th>ภาษีซื้อ</th><th>ภาษีชำระ</th><th>วันยื่น</th><th></th>
-              </tr>
-            </thead>
-            <tbody id="tblVATBody"><tr><td colspan="9" class="empty-td">ยังไม่มีข้อมูล</td></tr></tbody>
-          </table>
+        <div class="filter-bar">
+          <div class="select-wrap"><select id="vatCustFilter"><option value="">— ลูกค้าทั้งหมด —</option></select></div>
+        </div>
+        <div class="table-card">
+          <div class="table-scroll">
+            <table class="data-table">
+              <thead><tr>
+                <th>ลูกค้า</th><th>งวด</th><th class="num">ยอดขาย</th><th class="num">ยอดซื้อ</th>
+                <th class="num">ภาษีขาย</th><th class="num">ภาษีซื้อ</th><th class="num">ภาษีชำระ</th><th>วันยื่น</th><th></th>
+              </tr></thead>
+              <tbody id="tblVATBody"><tr><td colspan="9" style="text-align:center;padding:40px;color:var(--muted)">ยังไม่มีข้อมูล</td></tr></tbody>
+            </table>
+          </div>
         </div>
       </section>
 
-      <!-- ───────────────── SERVICE FEES ───────────────── -->
-      <section id="sec-fees" class="section">
-        <div class="section-header">
+      <!-- ═══════════════ TRACKING ═══════════════ -->
+      <section class="section" id="sec-tracking">
+        <div class="sec-header">
+          <h2>ติดตามเอกสาร</h2>
+          <div class="select-wrap"><select id="trackCustFilter"><option value="">— ลูกค้าทั้งหมด —</option></select></div>
+        </div>
+        <div class="table-card">
+          <div class="table-scroll">
+            <table class="data-table" id="tblTracking">
+              <thead>
+                <tr>
+                  <th style="position:sticky;left:0;background:var(--navy);z-index:2;min-width:160px">รหัส / ชื่อ</th>
+                  <th>13.8</th><th>14.8</th><th>15.8</th><th>18.8</th><th>19.8</th>
+                  <th>16.9</th><th>17.9</th><th>18.9</th><th>22.9</th>
+                  <th>14/10</th><th>17/10</th><th>20/10</th>
+                  <th>17.11</th><th>9.12</th><th>12.12</th>
+                  <th>16.1</th><th>20.1</th><th></th>
+                </tr>
+              </thead>
+              <tbody id="tblTrackingBody"><tr><td colspan="19" style="text-align:center;padding:40px;color:var(--muted)">ยังไม่มีข้อมูล</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══════════════ FEES ═══════════════ -->
+      <section class="section" id="sec-fees">
+        <div class="sec-header">
           <h2>ค่าบริการ / การเงิน</h2>
-          <div class="filter-row">
-            <select id="feesCustomerFilter" class="select-input"><option value="">— ลูกค้า —</option></select>
-            <button class="btn-primary" onclick="openModal('modalAddFee')">+ เพิ่มรายการ</button>
-          </div>
+          <button class="btn-add" onclick="openModal('modalAddFee')">＋ เพิ่มรายการ</button>
         </div>
-        <div class="table-wrap">
-          <table class="data-table" id="tblFees">
-            <thead>
-              <tr>
-                <th>ลูกค้า</th><th>ปี/เดือน</th><th>ค่าทำบัญชี</th>
-                <th>ภ.พ.30</th><th>สปส</th><th>ประกันสังคม</th>
-                <th>ค่าแรง</th><th>ค่าใช้จ่าย</th><th>รวม</th><th>ชำระ</th><th>คงเหลือ</th><th></th>
-              </tr>
-            </thead>
-            <tbody id="tblFeesBody"><tr><td colspan="12" class="empty-td">ยังไม่มีข้อมูล</td></tr></tbody>
-          </table>
+        <div class="filter-bar">
+          <div class="select-wrap"><select id="feesCustFilter"><option value="">— ลูกค้าทั้งหมด —</option></select></div>
+        </div>
+        <div class="table-card">
+          <div class="table-scroll">
+            <table class="data-table">
+              <thead><tr>
+                <th>ลูกค้า</th><th>ปี/เดือน</th>
+                <th class="num">ค่าทำบัญชี</th><th class="num">ภ.พ.30</th><th class="num">สปส</th>
+                <th class="num">ประกันสังคม</th><th class="num">ค่าแรง</th><th class="num">ค่าใช้จ่าย</th>
+                <th class="num">รวม</th><th class="num">ชำระ</th><th class="num">คงเหลือ</th><th></th>
+              </tr></thead>
+              <tbody id="tblFeesBody"><tr><td colspan="12" style="text-align:center;padding:40px;color:var(--muted)">ยังไม่มีข้อมูล</td></tr></tbody>
+            </table>
+          </div>
         </div>
       </section>
 
-    </main>
-  </div>
+    </div><!-- /page-body -->
+  </div><!-- /main-area -->
+</div><!-- /layout -->
 
-  <!-- ═══════════════════ MODALS ═══════════════════ -->
+<!-- ═══════════════════ MODALS ═══════════════════ -->
 
-  <!-- Config Modal -->
-  <div class="modal-overlay" id="modalConfig">
-    <div class="modal">
-      <div class="modal-header"><h3>ตั้งค่า Supabase</h3><button class="modal-close" onclick="closeModal('modalConfig')">✕</button></div>
-      <div class="modal-body">
-        <div class="form-group">
-          <label>Supabase URL</label>
-          <input type="text" id="cfgUrl" placeholder="https://xxxx.supabase.co" class="form-input" />
-        </div>
-        <div class="form-group">
-          <label>Anon Key</label>
-          <input type="text" id="cfgKey" placeholder="eyJ..." class="form-input" />
-        </div>
-        <small class="hint">ข้อมูลจะเก็บใน localStorage ของเบราว์เซอร์</small>
-      </div>
-      <div class="modal-footer">
-        <button class="btn-secondary" onclick="closeModal('modalConfig')">ยกเลิก</button>
-        <button class="btn-primary" onclick="saveConfig()">บันทึก & เชื่อมต่อ</button>
-      </div>
+<!-- Config -->
+<div class="modal-overlay" id="modalConfig">
+  <div class="modal">
+    <div class="modal-header"><h3>⚙ ตั้งค่า Supabase</h3><button class="modal-close" onclick="closeModal('modalConfig')">✕</button></div>
+    <div class="modal-body">
+      <div class="form-group" style="margin-bottom:12px"><label>Supabase URL</label><input type="text" id="cfgUrl" placeholder="https://xxxx.supabase.co" class="form-input" /></div>
+      <div class="form-group"><label>Anon Key</label><input type="text" id="cfgKey" placeholder="eyJ..." class="form-input" /></div>
+      <p style="font-size:11px;color:var(--muted);margin-top:10px">ข้อมูลจะเก็บใน localStorage ของเบราว์เซอร์เท่านั้น</p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal('modalConfig')">ยกเลิก</button>
+      <button class="btn-primary" onclick="saveConfig()">บันทึก & เชื่อมต่อ</button>
     </div>
   </div>
+</div>
 
-  <!-- Add Customer Modal -->
-  <div class="modal-overlay" id="modalAddCustomer">
-    <div class="modal">
-      <div class="modal-header"><h3>เพิ่มลูกค้าใหม่</h3><button class="modal-close" onclick="closeModal('modalAddCustomer')">✕</button></div>
-      <div class="modal-body">
-        <div class="form-row">
-          <div class="form-group"><label>รหัสลูกค้า *</label><input type="text" id="cust_code" placeholder="SM-103" class="form-input" /></div>
-          <div class="form-group"><label>ประเภท *</label>
-            <select id="cust_type" class="form-input">
-              <option value="ลูกค้า">ลูกค้า</option>
-              <option value="บริษัท">บริษัท</option>
-              <option value="หจก">หจก</option>
-            </select>
-          </div>
+<!-- Add Customer -->
+<div class="modal-overlay" id="modalAddCustomer">
+  <div class="modal">
+    <div class="modal-header"><h3>👤 เพิ่มลูกค้าใหม่</h3><button class="modal-close" onclick="closeModal('modalAddCustomer')">✕</button></div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group"><label>รหัสลูกค้า *</label><input type="text" id="cust_code" placeholder="SM-001" class="form-input" /></div>
+        <div class="form-group"><label>ประเภท *</label>
+          <select id="cust_type" class="form-input">
+            <option value="ลูกค้า">ลูกค้า</option>
+            <option value="บริษัท">บริษัท</option>
+            <option value="หจก">หจก</option>
+          </select>
         </div>
-        <div class="form-group"><label>เลขทะเบียน / เลขผู้เสียภาษี</label><input type="text" id="cust_taxid" class="form-input" /></div>
-        <div class="form-group"><label>ชื่อลูกค้า / ร้าน / บริษัท *</label><input type="text" id="cust_name" class="form-input" /></div>
-        <div class="form-row">
-          <div class="form-group"><label>ตามเอกสาร หักณ</label><input type="text" id="cust_doc_deduct" class="form-input" /></div>
-          <div class="form-group"><label>ตามเอกสาร 30</label><input type="text" id="cust_doc30" class="form-input" /></div>
-        </div>
-        <div class="form-group"><label>หมายเหตุ</label><textarea id="cust_notes" class="form-input" rows="2"></textarea></div>
       </div>
-      <div class="modal-footer">
-        <button class="btn-secondary" onclick="closeModal('modalAddCustomer')">ยกเลิก</button>
-        <button class="btn-primary" onclick="saveCustomer()">บันทึก</button>
+      <div class="form-group" style="margin-bottom:12px"><label>เลขทะเบียน / เลขผู้เสียภาษี 13 หลัก</label><input type="text" id="cust_taxid" class="form-input" maxlength="13" placeholder="1-0000-00000-00-0" /></div>
+      <div class="form-group" style="margin-bottom:12px"><label>ชื่อลูกค้า / ร้าน / บริษัท *</label><input type="text" id="cust_name" class="form-input" /></div>
+      <div class="form-row">
+        <div class="form-group"><label>ตามเอกสาร หักณ</label><input type="text" id="cust_doc_deduct" class="form-input" /></div>
+        <div class="form-group"><label>ตามเอกสาร 30</label><input type="text" id="cust_doc30" class="form-input" /></div>
       </div>
+      <div class="form-group"><label>หมายเหตุ</label><textarea id="cust_notes" class="form-input" rows="2"></textarea></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal('modalAddCustomer')">ยกเลิก</button>
+      <button class="btn-primary" onclick="saveCustomer()">บันทึก</button>
     </div>
   </div>
+</div>
 
-  <!-- Add WHT Modal -->
-  <div class="modal-overlay" id="modalAddWHT">
-    <div class="modal modal-wide">
-      <div class="modal-header"><h3>บันทึกภาษีหัก ณ ที่จ่าย</h3><button class="modal-close" onclick="closeModal('modalAddWHT')">✕</button></div>
-      <div class="modal-body">
-        <div class="form-row">
-          <div class="form-group"><label>ลูกค้า *</label><select id="wht_customer" class="form-input"></select></div>
-          <div class="form-group"><label>ปี (พ.ศ.) *</label><input type="number" id="wht_year" value="2568" class="form-input" /></div>
-          <div class="form-group"><label>เดือน *</label>
-            <select id="wht_month" class="form-input">
-              <option value="1">มกราคม</option><option value="2">กุมภาพันธ์</option><option value="3">มีนาคม</option>
-              <option value="4">เมษายน</option><option value="5">พฤษภาคม</option><option value="6">มิถุนายน</option>
-              <option value="7">กรกฎาคม</option><option value="8">สิงหาคม</option><option value="9">กันยายน</option>
-              <option value="10">ตุลาคม</option><option value="11">พฤศจิกายน</option><option value="12">ธันวาคม</option>
-            </select>
-          </div>
-        </div>
-        <div class="form-section-label">ภ.ง.ด.1</div>
-        <div class="form-row">
-          <div class="form-group"><label>จำนวนเงิน</label><input type="number" id="wht_pnd1" value="0" step="0.01" class="form-input" /></div>
-          <div class="form-group"><label>วันที่</label><input type="date" id="wht_pnd1_date" class="form-input" /></div>
-        </div>
-        <div class="form-section-label">ภ.ง.ด.3</div>
-        <div class="form-row">
-          <div class="form-group"><label>เราจ่าย</label><input type="number" id="wht_pnd3_pay" value="0" step="0.01" class="form-input" /></div>
-          <div class="form-group"><label>วันที่</label><input type="date" id="wht_pnd3_pay_date" class="form-input" /></div>
-          <div class="form-group"><label>เก็บลูกค้า</label><input type="number" id="wht_pnd3_col" value="0" step="0.01" class="form-input" /></div>
-          <div class="form-group"><label>วันที่</label><input type="date" id="wht_pnd3_col_date" class="form-input" /></div>
-        </div>
-        <div class="form-section-label">ภ.ง.ด.53</div>
-        <div class="form-row">
-          <div class="form-group"><label>เราจ่าย</label><input type="number" id="wht_pnd53_pay" value="0" step="0.01" class="form-input" /></div>
-          <div class="form-group"><label>วันที่</label><input type="date" id="wht_pnd53_pay_date" class="form-input" /></div>
-          <div class="form-group"><label>เก็บลูกค้า</label><input type="number" id="wht_pnd53_col" value="0" step="0.01" class="form-input" /></div>
-          <div class="form-group"><label>วันที่</label><input type="date" id="wht_pnd53_col_date" class="form-input" /></div>
-        </div>
-        <div class="form-section-label">ยื่นแบบ</div>
-        <div class="form-row">
-          <div class="form-group"><label>วันยื่น</label><input type="date" id="wht_filed_date" class="form-input" /></div>
-          <div class="form-group"><label>จำนวน</label><input type="number" id="wht_filed_amt" value="0" step="0.01" class="form-input" /></div>
-          <div class="form-group"><label>เลขอ้างอิง</label><input type="text" id="wht_filed_ref" class="form-input" /></div>
+<!-- Add WHT -->
+<div class="modal-overlay" id="modalAddWHT">
+  <div class="modal modal-wide">
+    <div class="modal-header"><h3>🧾 บันทึกภาษีหัก ณ ที่จ่าย</h3><button class="modal-close" onclick="closeModal('modalAddWHT')">✕</button></div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group"><label>ลูกค้า *</label><select id="wht_customer" class="form-input"></select></div>
+        <div class="form-group"><label>ปี (พ.ศ.) *</label><input type="number" id="wht_year" value="2568" class="form-input" /></div>
+        <div class="form-group"><label>เดือน *</label>
+          <select id="wht_month" class="form-input">
+            <option value="1">มกราคม</option><option value="2">กุมภาพันธ์</option><option value="3">มีนาคม</option>
+            <option value="4">เมษายน</option><option value="5">พฤษภาคม</option><option value="6">มิถุนายน</option>
+            <option value="7">กรกฎาคม</option><option value="8">สิงหาคม</option><option value="9">กันยายน</option>
+            <option value="10">ตุลาคม</option><option value="11">พฤศจิกายน</option><option value="12">ธันวาคม</option>
+          </select>
         </div>
       </div>
-      <div class="modal-footer">
-        <button class="btn-secondary" onclick="closeModal('modalAddWHT')">ยกเลิก</button>
-        <button class="btn-primary" onclick="saveWHT()">บันทึก</button>
+      <div class="form-section">ภ.ง.ด.1</div>
+      <div class="form-row">
+        <div class="form-group"><label>จำนวนเงิน</label><input type="number" id="wht_pnd1" value="0" step="0.01" class="form-input" /></div>
+        <div class="form-group"><label>วันที่ยื่น</label><input type="date" id="wht_pnd1_date" class="form-input" /></div>
+      </div>
+      <div class="form-section">ภ.ง.ด.3</div>
+      <div class="form-row">
+        <div class="form-group"><label>เราจ่าย</label><input type="number" id="wht_pnd3_pay" value="0" step="0.01" class="form-input" /></div>
+        <div class="form-group"><label>วันที่</label><input type="date" id="wht_pnd3_pay_date" class="form-input" /></div>
+        <div class="form-group"><label>เก็บลูกค้า</label><input type="number" id="wht_pnd3_col" value="0" step="0.01" class="form-input" /></div>
+        <div class="form-group"><label>วันที่</label><input type="date" id="wht_pnd3_col_date" class="form-input" /></div>
+      </div>
+      <div class="form-section">ภ.ง.ด.53</div>
+      <div class="form-row">
+        <div class="form-group"><label>เราจ่าย</label><input type="number" id="wht_pnd53_pay" value="0" step="0.01" class="form-input" /></div>
+        <div class="form-group"><label>วันที่</label><input type="date" id="wht_pnd53_pay_date" class="form-input" /></div>
+        <div class="form-group"><label>เก็บลูกค้า</label><input type="number" id="wht_pnd53_col" value="0" step="0.01" class="form-input" /></div>
+        <div class="form-group"><label>วันที่</label><input type="date" id="wht_pnd53_col_date" class="form-input" /></div>
+      </div>
+      <div class="form-section">ยื่นแบบ</div>
+      <div class="form-row">
+        <div class="form-group"><label>วันยื่น</label><input type="date" id="wht_filed_date" class="form-input" /></div>
+        <div class="form-group"><label>จำนวนเงิน</label><input type="number" id="wht_filed_amt" value="0" step="0.01" class="form-input" /></div>
+        <div class="form-group"><label>เลขอ้างอิง</label><input type="text" id="wht_filed_ref" class="form-input" /></div>
       </div>
     </div>
-  </div>
-
-  <!-- Add VAT Modal -->
-  <div class="modal-overlay" id="modalAddVAT">
-    <div class="modal">
-      <div class="modal-header"><h3>บันทึก ภ.พ.30 / VAT</h3><button class="modal-close" onclick="closeModal('modalAddVAT')">✕</button></div>
-      <div class="modal-body">
-        <div class="form-row">
-          <div class="form-group"><label>ลูกค้า *</label><select id="vat_customer" class="form-input"></select></div>
-          <div class="form-group"><label>งวด (เช่น 6/67)</label><input type="text" id="vat_label" placeholder="6/67" class="form-input" /></div>
-        </div>
-        <div class="form-row">
-          <div class="form-group"><label>เดือน *</label><select id="vat_month" class="form-input">
-            <option value="1">1</option><option value="2">2</option><option value="3">3</option>
-            <option value="4">4</option><option value="5">5</option><option value="6">6</option>
-            <option value="7">7</option><option value="8">8</option><option value="9">9</option>
-            <option value="10">10</option><option value="11">11</option><option value="12">12</option>
-          </select></div>
-          <div class="form-group"><label>ปี (พ.ศ.) *</label><input type="number" id="vat_year" value="2568" class="form-input" /></div>
-        </div>
-        <div class="form-row">
-          <div class="form-group"><label>ยอดขาย</label><input type="number" id="vat_sales" value="0" step="0.01" class="form-input" /></div>
-          <div class="form-group"><label>ยอดซื้อ</label><input type="number" id="vat_purchase" value="0" step="0.01" class="form-input" /></div>
-        </div>
-        <div class="form-row">
-          <div class="form-group"><label>ภาษีขาย</label><input type="number" id="vat_output" value="0" step="0.01" class="form-input" /></div>
-          <div class="form-group"><label>ภาษีซื้อ</label><input type="number" id="vat_input" value="0" step="0.01" class="form-input" /></div>
-          <div class="form-group"><label>ภาษีที่ต้องชำระ</label><input type="number" id="vat_payable" value="0" step="0.01" class="form-input" /></div>
-        </div>
-        <div class="form-row">
-          <div class="form-group"><label>วันยื่น</label><input type="date" id="vat_filed" class="form-input" /></div>
-          <div class="form-group"><label>เลขที่ใบเสร็จ</label><input type="text" id="vat_receipt" class="form-input" /></div>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button class="btn-secondary" onclick="closeModal('modalAddVAT')">ยกเลิก</button>
-        <button class="btn-primary" onclick="saveVAT()">บันทึก</button>
-      </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal('modalAddWHT')">ยกเลิก</button>
+      <button class="btn-primary" onclick="saveWHT()">บันทึก</button>
     </div>
   </div>
+</div>
 
-  <!-- Add Fee Modal -->
-  <div class="modal-overlay" id="modalAddFee">
-    <div class="modal modal-wide">
-      <div class="modal-header"><h3>บันทึกค่าบริการ</h3><button class="modal-close" onclick="closeModal('modalAddFee')">✕</button></div>
-      <div class="modal-body">
-        <div class="form-row">
-          <div class="form-group"><label>ลูกค้า *</label><select id="fee_customer" class="form-input"></select></div>
-          <div class="form-group"><label>ปี (พ.ศ.) *</label><input type="number" id="fee_year" value="2568" class="form-input" /></div>
-          <div class="form-group"><label>เดือน *</label>
-            <select id="fee_month" class="form-input">
-              <option value="1">มกราคม</option><option value="2">กุมภาพันธ์</option><option value="3">มีนาคม</option>
-              <option value="4">เมษายน</option><option value="5">พฤษภาคม</option><option value="6">มิถุนายน</option>
-              <option value="7">กรกฎาคม</option><option value="8">สิงหาคม</option><option value="9">กันยายน</option>
-              <option value="10">ตุลาคม</option><option value="11">พฤศจิกายน</option><option value="12">ธันวาคม</option>
-            </select>
-          </div>
-        </div>
-        <div class="form-row">
-          <div class="form-group"><label>ค่าทำบัญชี</label><input type="number" id="fee_acct" value="0" step="0.01" class="form-input" /></div>
-          <div class="form-group"><label>ยื่น ภ.พ.30</label><input type="number" id="fee_pp30" value="0" step="0.01" class="form-input" /></div>
-          <div class="form-group"><label>ตามเอกสาร สปส</label><input type="number" id="fee_sps" value="0" step="0.01" class="form-input" /></div>
-          <div class="form-group"><label>ยื่นประกันสังคม</label><input type="number" id="fee_socins" value="0" step="0.01" class="form-input" /></div>
-        </div>
-        <div class="form-row">
-          <div class="form-group"><label>แพ็คเอกสาร</label><input type="number" id="fee_pack" value="0" step="0.01" class="form-input" /></div>
-          <div class="form-group"><label>อื่นๆ</label><input type="number" id="fee_other" value="0" step="0.01" class="form-input" /></div>
-          <div class="form-group"><label>ค่าแรง</label><input type="number" id="fee_labor" value="0" step="0.01" class="form-input" /></div>
-          <div class="form-group"><label>ค่าใช้จ่าย</label><input type="number" id="fee_expense" value="0" step="0.01" class="form-input" /></div>
-        </div>
-        <div class="form-row">
-          <div class="form-group"><label>สต็อกสินค้า</label><input type="number" id="fee_inventory" value="0" step="0.01" class="form-input" /></div>
-          <div class="form-group"><label>วันที่ชำระ</label><input type="date" id="fee_paid_date" class="form-input" /></div>
-          <div class="form-group"><label>จำนวนที่ชำระ</label><input type="number" id="fee_paid_amt" value="0" step="0.01" class="form-input" /></div>
-        </div>
-        <div class="form-group"><label>หมายเหตุ</label><textarea id="fee_remark" class="form-input" rows="2"></textarea></div>
+<!-- Add VAT -->
+<div class="modal-overlay" id="modalAddVAT">
+  <div class="modal">
+    <div class="modal-header"><h3>📊 บันทึก ภ.พ.30 / VAT</h3><button class="modal-close" onclick="closeModal('modalAddVAT')">✕</button></div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group"><label>ลูกค้า *</label><select id="vat_customer" class="form-input"></select></div>
+        <div class="form-group"><label>งวด (เช่น 6/67)</label><input type="text" id="vat_label" placeholder="6/67" class="form-input" /></div>
       </div>
-      <div class="modal-footer">
-        <button class="btn-secondary" onclick="closeModal('modalAddFee')">ยกเลิก</button>
-        <button class="btn-primary" onclick="saveFee()">บันทึก</button>
+      <div class="form-row">
+        <div class="form-group"><label>เดือน *</label><select id="vat_month" class="form-input">
+          <option value="1">1</option><option value="2">2</option><option value="3">3</option>
+          <option value="4">4</option><option value="5">5</option><option value="6">6</option>
+          <option value="7">7</option><option value="8">8</option><option value="9">9</option>
+          <option value="10">10</option><option value="11">11</option><option value="12">12</option>
+        </select></div>
+        <div class="form-group"><label>ปี (พ.ศ.) *</label><input type="number" id="vat_year" value="2568" class="form-input" /></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>ยอดขาย</label><input type="number" id="vat_sales" value="0" step="0.01" class="form-input" /></div>
+        <div class="form-group"><label>ยอดซื้อ</label><input type="number" id="vat_purchase" value="0" step="0.01" class="form-input" /></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>ภาษีขาย</label><input type="number" id="vat_output" value="0" step="0.01" class="form-input" /></div>
+        <div class="form-group"><label>ภาษีซื้อ</label><input type="number" id="vat_input" value="0" step="0.01" class="form-input" /></div>
+        <div class="form-group"><label>ภาษีที่ต้องชำระ</label><input type="number" id="vat_payable" value="0" step="0.01" class="form-input" /></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>วันยื่น</label><input type="date" id="vat_filed" class="form-input" /></div>
+        <div class="form-group"><label>เลขที่ใบเสร็จ</label><input type="text" id="vat_receipt" class="form-input" /></div>
       </div>
     </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal('modalAddVAT')">ยกเลิก</button>
+      <button class="btn-primary" onclick="saveVAT()">บันทึก</button>
+    </div>
   </div>
+</div>
 
-  <!-- Toast -->
-  <div class="toast" id="toast"></div>
+<!-- Add Fee -->
+<div class="modal-overlay" id="modalAddFee">
+  <div class="modal modal-wide">
+    <div class="modal-header"><h3>💰 บันทึกค่าบริการ</h3><button class="modal-close" onclick="closeModal('modalAddFee')">✕</button></div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group"><label>ลูกค้า *</label><select id="fee_customer" class="form-input"></select></div>
+        <div class="form-group"><label>ปี (พ.ศ.) *</label><input type="number" id="fee_year" value="2568" class="form-input" /></div>
+        <div class="form-group"><label>เดือน *</label>
+          <select id="fee_month" class="form-input">
+            <option value="1">มกราคม</option><option value="2">กุมภาพันธ์</option><option value="3">มีนาคม</option>
+            <option value="4">เมษายน</option><option value="5">พฤษภาคม</option><option value="6">มิถุนายน</option>
+            <option value="7">กรกฎาคม</option><option value="8">สิงหาคม</option><option value="9">กันยายน</option>
+            <option value="10">ตุลาคม</option><option value="11">พฤศจิกายน</option><option value="12">ธันวาคม</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>ค่าทำบัญชี</label><input type="number" id="fee_acct" value="0" step="0.01" class="form-input" /></div>
+        <div class="form-group"><label>ยื่น ภ.พ.30</label><input type="number" id="fee_pp30" value="0" step="0.01" class="form-input" /></div>
+        <div class="form-group"><label>ตามเอกสาร สปส</label><input type="number" id="fee_sps" value="0" step="0.01" class="form-input" /></div>
+        <div class="form-group"><label>ยื่นประกันสังคม</label><input type="number" id="fee_socins" value="0" step="0.01" class="form-input" /></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>แพ็คเอกสาร</label><input type="number" id="fee_pack" value="0" step="0.01" class="form-input" /></div>
+        <div class="form-group"><label>อื่นๆ</label><input type="number" id="fee_other" value="0" step="0.01" class="form-input" /></div>
+        <div class="form-group"><label>ค่าแรง</label><input type="number" id="fee_labor" value="0" step="0.01" class="form-input" /></div>
+        <div class="form-group"><label>ค่าใช้จ่าย</label><input type="number" id="fee_expense" value="0" step="0.01" class="form-input" /></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>สต็อกสินค้า</label><input type="number" id="fee_inventory" value="0" step="0.01" class="form-input" /></div>
+        <div class="form-group"><label>วันที่ชำระ</label><input type="date" id="fee_paid_date" class="form-input" /></div>
+        <div class="form-group"><label>จำนวนที่ชำระ</label><input type="number" id="fee_paid_amt" value="0" step="0.01" class="form-input" /></div>
+      </div>
+      <div class="form-group"><label>หมายเหตุ</label><textarea id="fee_remark" class="form-input" rows="2"></textarea></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal('modalAddFee')">ยกเลิก</button>
+      <button class="btn-primary" onclick="saveFee()">บันทึก</button>
+    </div>
+  </div>
+</div>
 
-  <script src="app.js"></script>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============================================================
+   S ACCOUNT — app.js (embedded)
+============================================================ */
+
+// ── CONFIG ──────────────────────────────────────────────
+let SUPABASE_URL = localStorage.getItem('sa_url') || '';
+let SUPABASE_KEY = localStorage.getItem('sa_key') || '';
+
+// ── SUPABASE HELPERS ─────────────────────────────────────
+function sbHeaders() {
+  return {
+    'Content-Type':  'application/json',
+    'apikey':        SUPABASE_KEY,
+    'Authorization': `Bearer ${SUPABASE_KEY}`,
+    'Prefer':        'return=representation'
+  };
+}
+async function sbSelect(table, params='') {
+  const r = await fetch(`${SUPABASE_URL}/rest/v1/${table}?${params}&order=created_at.desc`, { headers: sbHeaders() });
+  if (!r.ok) throw new Error(await r.text());
+  return r.json();
+}
+async function sbInsert(table, body) {
+  const r = await fetch(`${SUPABASE_URL}/rest/v1/${table}`, { method:'POST', headers:sbHeaders(), body:JSON.stringify(body) });
+  if (!r.ok) throw new Error(await r.text());
+  return r.json();
+}
+async function sbUpdate(table, id, body) {
+  const r = await fetch(`${SUPABASE_URL}/rest/v1/${table}?id=eq.${id}`, { method:'PATCH', headers:sbHeaders(), body:JSON.stringify(body) });
+  if (!r.ok) throw new Error(await r.text());
+  return r.json();
+}
+async function sbDelete(table, id) {
+  const r = await fetch(`${SUPABASE_URL}/rest/v1/${table}?id=eq.${id}`, { method:'DELETE', headers:sbHeaders() });
+  if (!r.ok) throw new Error(await r.text());
+}
+
+// ── TOAST ────────────────────────────────────────────────
+function showToast(msg, type='') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = `toast show ${type}`;
+  setTimeout(() => t.className = 'toast', 3200);
+}
+
+// ── MODAL ────────────────────────────────────────────────
+function openModal(id)  { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.modal-overlay').forEach(m =>
+  m.addEventListener('click', e => { if (e.target===m) m.classList.remove('open'); })
+);
+
+// ── NAVIGATION ───────────────────────────────────────────
+const sectionMeta = {
+  'dashboard':     { title:'Dashboard',              sub:'ภาพรวมระบบบัญชี' },
+  'customer-list': { title:'รายการลูกค้าทั้งหมด',     sub:'จัดการข้อมูลลูกค้า' },
+  'wht':           { title:'บันทึกภาษีหัก ณ ที่จ่าย', sub:'ภ.ง.ด.1 · ภ.ง.ด.3 · ภ.ง.ด.53' },
+  'vat':           { title:'ภ.พ.30 / VAT',            sub:'บันทึกและติดตาม VAT รายเดือน' },
+  'tracking':      { title:'ติดตามเอกสาร',             sub:'สถานะเอกสารรายลูกค้า' },
+  'fees':          { title:'ค่าบริการ / การเงิน',       sub:'บันทึกค่าบริการและการชำระเงิน' },
+};
+
+function goSection(name) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+  document.getElementById(`sec-${name}`)?.classList.add('active');
+  document.querySelector(`[data-section="${name}"]`)?.classList.add('active');
+  const meta = sectionMeta[name] || {};
+  document.getElementById('topbarTitle').textContent = meta.title || '';
+  document.getElementById('topbarSub').textContent   = meta.sub   || '';
+  if (name==='customer-list') loadCustomerTable();
+  if (name==='tracking')      loadTrackingTable();
+  if (name==='wht')           { loadWHTTable(); }
+  if (name==='vat')           loadVATTable();
+  if (name==='fees')          loadFeesTable();
+}
+document.querySelectorAll('.nav-item').forEach(b =>
+  b.addEventListener('click', () => goSection(b.dataset.section))
+);
+
+// ── CUSTOMERS ────────────────────────────────────────────
+let allCustomers = [];
+
+async function loadCustomers() {
+  try {
+    allCustomers = await sbSelect('customers','select=id,customer_code,name,customer_type,tax_id&is_active=eq.true');
+    return allCustomers;
+  } catch { return []; }
+}
+
+function renderCustomerList(custs) {
+  const el = document.getElementById('customerList');
+  if (!custs.length) { el.innerHTML = '<div class="empty-state"><div class="icon">🔍</div><p>ไม่พบข้อมูลลูกค้า</p></div>'; return; }
+  el.innerHTML = custs.map(c => `
+    <div class="cust-card" onclick="goSection('customer-list')">
+      <div class="code-badge">${c.customer_code}</div>
+      <div class="cust-info">
+        <div class="cust-main">${c.name}</div>
+        <div class="cust-taxid">${c.tax_id || '—'}</div>
+      </div>
+      <span class="cust-type-tag">${c.customer_type||'ลูกค้า'}</span>
+      <div class="cust-actions">
+        <button class="btn-icon-sm" onclick="event.stopPropagation();editCustomer('${c.id}')">✏</button>
+        <button class="btn-icon-sm" onclick="event.stopPropagation();deleteCustomer('${c.id}')">🗑</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function loadCustomerTable() {
+  const tbody = document.getElementById('tblCustomersBody');
+  if (!allCustomers.length) return;
+  tbody.innerHTML = allCustomers.map((c,i) => `
+    <tr>
+      <td class="row-num">${i+1}</td>
+      <td><span class="code-badge">${c.customer_code}</span></td>
+      <td style="font-family:'IBM Plex Mono',monospace;font-size:11px">${c.tax_id||'—'}</td>
+      <td><b>${c.name}</b></td>
+      <td><span class="cust-type-tag">${c.customer_type||'—'}</span></td>
+      <td class="center"><span class="badge badge-filed">ใช้งาน</span></td>
+      <td>
+        <button class="btn-icon-sm" onclick="editCustomer('${c.id}')">✏</button>
+        <button class="btn-icon-sm" onclick="deleteCustomer('${c.id}')">🗑</button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+async function saveCustomer() {
+  const body = {
+    customer_code: val('cust_code'), tax_id: val('cust_taxid'),
+    name: val('cust_name'), customer_type: val('cust_type'),
+    doc_deduct: val('cust_doc_deduct'), doc_30: val('cust_doc30'), notes: val('cust_notes')
+  };
+  if (!body.customer_code || !body.name) return showToast('กรุณากรอกรหัสและชื่อลูกค้า','err');
+  try {
+    await sbInsert('customers', body);
+    closeModal('modalAddCustomer'); showToast('เพิ่มลูกค้าสำเร็จ','ok'); await initDashboard();
+  } catch(e) { showToast('เกิดข้อผิดพลาด: '+e.message,'err'); }
+}
+
+function editCustomer(id) {
+  const c = allCustomers.find(x=>x.id===id); if(!c) return;
+  document.getElementById('cust_code').value  = c.customer_code;
+  document.getElementById('cust_taxid').value = c.tax_id||'';
+  document.getElementById('cust_name').value  = c.name;
+  document.getElementById('cust_type').value  = c.customer_type||'ลูกค้า';
+  openModal('modalAddCustomer');
+}
+
+async function deleteCustomer(id) {
+  if (!confirm('ลบลูกค้านี้?')) return;
+  try { await sbDelete('customers',id); showToast('ลบสำเร็จ','ok'); await initDashboard(); }
+  catch(e) { showToast(e.message,'err'); }
+}
+
+// ── WHT TABLE (with pagination) ──────────────────────────
+let whtAllRows = [];
+let whtPage = 1;
+
+async function loadWHTTable() {
+  // set month label
+  const now = new Date();
+  document.getElementById('whtMonthLabel').textContent = `มิถุนายน ${now.getFullYear()+543}`;
+
+  const tbody = document.getElementById('tblWHTBody');
+  try {
+    whtAllRows = await sbSelect('withholding_tax','select=*,customers(customer_code,name,tax_id)&limit=500');
+    renderWHTTable();
+    updateWHTSummary();
+  } catch(e) {
+    tbody.innerHTML = `<tr><td colspan="13" style="text-align:center;padding:40px;color:var(--muted)">${e.message}</td></tr>`;
+  }
+}
+
+function renderWHTTable() {
+  const search  = document.getElementById('whtSearch').value.toLowerCase();
+  const status  = document.getElementById('whtStatusFilter').value;
+  const perPage = +document.getElementById('whtPerPage').value || 50;
+
+  let rows = whtAllRows.filter(r => {
+    const name = (r.customers?.name||'').toLowerCase();
+    const tax  = (r.customers?.tax_id||'').toLowerCase();
+    if (search && !name.includes(search) && !tax.includes(search)) return false;
+    if (status) {
+      const s = rowStatus(r);
+      if (status==='filed'   && s!=='filed')   return false;
+      if (status==='pending' && s!=='pending') return false;
+      if (status==='wait'    && s!=='wait')    return false;
+    }
+    return true;
+  });
+
+  const total = rows.length;
+  const pages = Math.max(1, Math.ceil(total/perPage));
+  if (whtPage > pages) whtPage = 1;
+  const slice = rows.slice((whtPage-1)*perPage, whtPage*perPage);
+
+  document.getElementById('whtPageInfo').textContent = `${total} รายการ · หน้า ${whtPage} / ${pages}`;
+  renderWHTPagination(pages);
+
+  const tbody = document.getElementById('tblWHTBody');
+  if (!slice.length) {
+    tbody.innerHTML = `<tr><td colspan="13" style="text-align:center;padding:40px;color:var(--muted)">ไม่พบข้อมูล</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = slice.map((r, i) => {
+    const st = rowStatus(r);
+    const stBadge = st==='filed'   ? '<span class="badge badge-filed">ยื่นแล้ว</span>'   :
+                    st==='pending' ? '<span class="badge badge-pending">ยื่นแล้วรอชำระ</span>' :
+                                     '<span class="badge badge-wait">รอดำเนินการ</span>';
+    const isNew = r.customers?.name?.includes('●') || (i<2 && !r.filed_date);
+    return `
+    <tr>
+      <td class="row-num">${(whtPage-1)*perPage+i+1}</td>
+      <td>
+        <div class="cust-name-main">${r.customers?.name||'—'}${isNew?'<span class="dot-new"></span>':''}</div>
+        <div class="cust-name-sub">${r.customers?.tax_id||r.customers?.customer_code||'—'}</div>
+      </td>
+      <td class="num">${fmtN(r.pnd1_amount)}</td>
+      <td class="num num-col">${fmtN(r.pnd1_amount)}</td>
+      <td class="num">${fmtN(r.pnd3_we_pay)}</td>
+      <td class="num num-col">${fmtN(r.pnd3_collect)}</td>
+      <td class="num">${fmtN(r.pnd53_we_pay)}</td>
+      <td class="num num-col">${fmtN(r.pnd53_collect)}</td>
+      <td class="num"><b>${fmtN((r.pnd1_amount||0)+(r.pnd3_we_pay||0)+(r.pnd53_we_pay||0))}</b></td>
+      <td class="num num-col">${fmtN((r.pnd3_collect||0)+(r.pnd53_collect||0))}</td>
+      <td class="center">${stBadge}</td>
+      <td>
+        <div class="pay-input-wrap">
+          <input type="checkbox" class="pay-checkbox" id="chk_${r.id}" ${r.paid_extra?'checked':''} onchange="toggleExtra('${r.id}',this)" />
+          <input type="number" class="pay-inline-input ${r.paid_extra?'show':''}" id="inp_${r.id}" value="${r.paid_extra||''}" placeholder="0.00" onblur="saveExtra('${r.id}',this.value)" />
+        </div>
+      </td>
+      <td><button class="btn-row-del" onclick="deleteRow('withholding_tax','${r.id}')">🗑</button></td>
+    </tr>`;
+  }).join('');
+}
+
+function rowStatus(r) {
+  if (r.filed_date && r.filed_amount > 0) return 'filed';
+  if (r.filed_date) return 'pending';
+  return 'wait';
+}
+
+function renderWHTPagination(pages) {
+  const ctrl = document.getElementById('whtPageControls');
+  let html = `<button class="page-btn" onclick="whtSetPage(${whtPage-1})" ${whtPage<=1?'disabled':''}>‹</button>`;
+  const range = [];
+  for (let p=1; p<=pages; p++) {
+    if (p===1||p===pages||Math.abs(p-whtPage)<=2) range.push(p);
+    else if (range[range.length-1]!=='...') range.push('...');
+  }
+  range.forEach(p => {
+    if (p==='...') html += `<span class="page-btn" style="border:none;cursor:default">…</span>`;
+    else html += `<button class="page-btn ${p===whtPage?'active':''}" onclick="whtSetPage(${p})">${p}</button>`;
+  });
+  html += `<button class="page-btn" onclick="whtSetPage(${whtPage+1})" ${whtPage>=pages?'disabled':''}>›</button>`;
+  ctrl.innerHTML = html;
+}
+
+function whtSetPage(p) { whtPage = p; renderWHTTable(); }
+function whtGotoPage() {
+  const v = +document.getElementById('whtGotoInput').value;
+  if (v>=1) whtSetPage(v);
+}
+
+function updateWHTSummary() {
+  let totalPay=0, totalCol=0, pendAmt=0, doneAmt=0, pendCnt=0, doneCnt=0;
+  whtAllRows.forEach(r => {
+    const pay = (r.pnd1_amount||0)+(r.pnd3_we_pay||0)+(r.pnd53_we_pay||0);
+    const col = (r.pnd3_collect||0)+(r.pnd53_collect||0);
+    totalPay += pay; totalCol += col;
+    const st = rowStatus(r);
+    if (st==='pending') { pendAmt += pay; pendCnt++; }
+    if (st==='filed')   { doneAmt += col; doneCnt++; }
+  });
+  const grand = totalPay + totalCol;
+  document.getElementById('sumTotal').innerHTML = fmtM(grand)+'<span> บ</span>';
+  document.getElementById('sumPay').innerHTML   = fmtM(totalPay)+'<span> บ</span>';
+  document.getElementById('sumCol').innerHTML   = fmtM(totalCol)+'<span> บ</span>';
+  document.getElementById('sumPend').innerHTML  = fmtM(pendAmt)+'<span> บ</span>';
+  document.getElementById('sumPendSub').textContent = `${pendCnt} บริษัท`;
+  document.getElementById('sumDone').innerHTML  = fmtM(doneAmt)+'<span> บ</span>';
+  document.getElementById('sumDoneSub').textContent = `${doneCnt} บริษัท`;
+  document.getElementById('navBadgeWHT').textContent = whtAllRows.length;
+}
+
+function toggleExtra(id, chk) {
+  const inp = document.getElementById(`inp_${id}`);
+  if (chk.checked) { inp.classList.add('show'); inp.focus(); }
+  else { inp.classList.remove('show'); saveExtra(id, null); }
+}
+async function saveExtra(id, val) {
+  try { await sbUpdate('withholding_tax', id, { paid_extra: val ? +val : null }); }
+  catch(e) { showToast(e.message,'err'); }
+}
+
+function exportWHT() {
+  const rows = whtAllRows;
+  const csv = ['#,ลูกค้า,เลขภาษี,ภ.ง.ด.1,ภ.ง.ด.3 จ่าย,ภ.ง.ด.3 เก็บ,ภ.ง.ด.53 จ่าย,ภ.ง.ด.53 เก็บ,วันยื่น'].concat(
+    rows.map((r,i)=>[i+1,r.customers?.name||'',r.customers?.tax_id||'',
+      r.pnd1_amount||0, r.pnd3_we_pay||0, r.pnd3_collect||0,
+      r.pnd53_we_pay||0, r.pnd53_collect||0, r.filed_date||''].join(','))
+  ).join('\n');
+  const a = document.createElement('a');
+  a.href = 'data:text/csv;charset=utf-8,\uFEFF'+encodeURIComponent(csv);
+  a.download = 'WHT_export.csv'; a.click();
+}
+
+// WHT filter events
+['whtSearch','whtStatusFilter','whtTypeFilter','whtPerPage'].forEach(id => {
+  document.getElementById(id)?.addEventListener('change', () => { whtPage=1; renderWHTTable(); });
+  document.getElementById(id)?.addEventListener('input',  () => { whtPage=1; renderWHTTable(); });
+});
+
+// ── SAVE WHT ────────────────────────────────────────────
+async function saveWHT() {
+  const body = {
+    customer_id: val('wht_customer'), tax_year: +val('wht_year'), tax_month: +val('wht_month'),
+    pnd1_amount: +val('wht_pnd1'), pnd1_date: val('wht_pnd1_date')||null,
+    pnd3_we_pay: +val('wht_pnd3_pay'), pnd3_we_date: val('wht_pnd3_pay_date')||null,
+    pnd3_collect: +val('wht_pnd3_col'), pnd3_col_date: val('wht_pnd3_col_date')||null,
+    pnd53_we_pay: +val('wht_pnd53_pay'), pnd53_we_date: val('wht_pnd53_pay_date')||null,
+    pnd53_collect: +val('wht_pnd53_col'), pnd53_col_date: val('wht_pnd53_col_date')||null,
+    filed_date: val('wht_filed_date')||null, filed_amount: +val('wht_filed_amt'),
+    filed_ref: val('wht_filed_ref')
+  };
+  if (!body.customer_id) return showToast('กรุณาเลือกลูกค้า','err');
+  try { await sbInsert('withholding_tax',body); closeModal('modalAddWHT'); showToast('บันทึกสำเร็จ','ok'); loadWHTTable(); }
+  catch(e) { showToast(e.message,'err'); }
+}
+
+// ── VAT ──────────────────────────────────────────────────
+async function loadVATTable() {
+  const tbody = document.getElementById('tblVATBody');
+  try {
+    const rows = await sbSelect('vat_pp30','select=*,customers(customer_code,name)&limit=100');
+    if (!rows.length) { tbody.innerHTML='<tr><td colspan="9" style="text-align:center;padding:40px;color:var(--muted)">ยังไม่มีข้อมูล</td></tr>'; return; }
+    tbody.innerHTML = rows.map(r=>`
+      <tr>
+        <td><b>${r.customers?.customer_code||'—'}</b> ${r.customers?.name?.substring(0,20)||''}</td>
+        <td>${r.period_label||`${r.period_month}/${r.period_year}`}</td>
+        <td class="num">${fmtN(r.sales_amount)}</td>
+        <td class="num">${fmtN(r.purchase_amount)}</td>
+        <td class="num">${fmtN(r.vat_output)}</td>
+        <td class="num">${fmtN(r.vat_input)}</td>
+        <td class="num"><b>${fmtN(r.vat_payable)}</b></td>
+        <td>${r.filed_date||'—'}</td>
+        <td><button class="btn-row-del" onclick="deleteRow('vat_pp30','${r.id}')">🗑</button></td>
+      </tr>`).join('');
+  } catch(e) { tbody.innerHTML=`<tr><td colspan="9" style="text-align:center;padding:40px;color:var(--muted)">${e.message}</td></tr>`; }
+}
+async function saveVAT() {
+  const body = {
+    customer_id: val('vat_customer'), period_label: val('vat_label'),
+    period_month: +val('vat_month'), period_year: +val('vat_year'),
+    sales_amount: +val('vat_sales'), purchase_amount: +val('vat_purchase'),
+    vat_output: +val('vat_output'), vat_input: +val('vat_input'),
+    vat_payable: +val('vat_payable'), filed_date: val('vat_filed')||null, receipt_no: val('vat_receipt')
+  };
+  if (!body.customer_id) return showToast('กรุณาเลือกลูกค้า','err');
+  try { await sbInsert('vat_pp30',body); closeModal('modalAddVAT'); showToast('บันทึกสำเร็จ','ok'); loadVATTable(); }
+  catch(e) { showToast(e.message,'err'); }
+}
+
+// ── TRACKING ─────────────────────────────────────────────
+const TRACK_COLS = [
+  {key:'track_13_8_68',label:'13.8'},{key:'track_14_8_68',label:'14.8'},{key:'track_15_8_68',label:'15.8'},
+  {key:'track_18_8_68',label:'18.8'},{key:'track_19_8_68',label:'19.8'},{key:'track_16_9_68',label:'16.9'},
+  {key:'track_17_9_68',label:'17.9'},{key:'track_18_9_68',label:'18.9'},{key:'track_22_9_68',label:'22.9'},
+  {key:'track_14_10_68',label:'14/10'},{key:'track_17_10_68',label:'17/10'},{key:'track_20_10_68',label:'20/10'},
+  {key:'track_17_11_68',label:'17.11'},{key:'track_9_12_68',label:'9.12'},{key:'track_12_12_68',label:'12.12'},
+  {key:'track_16_1_69',label:'16.1'},{key:'track_20_1_69',label:'20.1'}
+];
+
+async function loadTrackingTable() {
+  const tbody = document.getElementById('tblTrackingBody');
+  try {
+    const rows = await sbSelect('document_tracking','select=*,customers(customer_code,name)');
+    if (!rows.length) { tbody.innerHTML='<tr><td colspan="19" style="text-align:center;padding:40px;color:var(--muted)">ยังไม่มีข้อมูล</td></tr>'; return; }
+    tbody.innerHTML = rows.map(r=>`
+      <tr>
+        <td style="position:sticky;left:0;background:#fff;border-right:2px solid var(--border);min-width:160px">
+          <b>${r.customers?.customer_code||'—'}</b><br/>
+          <span style="font-size:11px;color:var(--muted)">${r.customers?.name?.substring(0,20)||''}</span>
+        </td>
+        ${TRACK_COLS.map(c=>`
+          <td class="center">
+            <div class="track-cell ${r[c.key]?'done':''}" title="${r[c.key]||''}" onclick="toggleTrack('${r.id}','${c.key}','${r[c.key]||''}')">
+              ${r[c.key]?'✓':''}
+            </div>
+          </td>
+        `).join('')}
+        <td><button class="btn-row-del" onclick="deleteRow('document_tracking','${r.id}')">🗑</button></td>
+      </tr>`).join('');
+  } catch(e) { tbody.innerHTML=`<tr><td colspan="19" style="text-align:center;padding:40px;color:var(--muted)">${e.message}</td></tr>`; }
+}
+async function toggleTrack(id, col, current) {
+  const newVal = current ? null : new Date().toISOString().split('T')[0];
+  try { await sbUpdate('document_tracking',id,{[col]:newVal}); loadTrackingTable(); }
+  catch(e) { showToast(e.message,'err'); }
+}
+
+// ── FEES ─────────────────────────────────────────────────
+async function loadFeesTable() {
+  const tbody = document.getElementById('tblFeesBody');
+  try {
+    const rows = await sbSelect('service_fees','select=*,customers(customer_code,name)&limit=100');
+    if (!rows.length) { tbody.innerHTML='<tr><td colspan="12" style="text-align:center;padding:40px;color:var(--muted)">ยังไม่มีข้อมูล</td></tr>'; return; }
+    tbody.innerHTML = rows.map(r=>{
+      const tot = r.total_fee || (r.accounting_fee+r.pp30_fee+r.sps_fee+r.social_ins_fee+r.pack_fee+r.other_fee+r.labor_cost+r.expense_cost);
+      const bal = tot-(r.paid_amount||0);
+      return `<tr>
+        <td>${r.customers?.customer_code||'—'} ${r.customers?.name?.substring(0,18)||''}</td>
+        <td>${r.fee_year}/${r.fee_month}</td>
+        <td class="num">${fmtN(r.accounting_fee)}</td>
+        <td class="num">${fmtN(r.pp30_fee)}</td>
+        <td class="num">${fmtN(r.sps_fee)}</td>
+        <td class="num">${fmtN(r.social_ins_fee)}</td>
+        <td class="num">${fmtN(r.labor_cost)}</td>
+        <td class="num">${fmtN(r.expense_cost)}</td>
+        <td class="num"><b>${fmtN(tot)}</b></td>
+        <td class="num" style="color:var(--emerald)">${fmtN(r.paid_amount)}</td>
+        <td class="num" style="color:${bal>0?'var(--coral)':'var(--emerald)'}">${fmtN(bal)}</td>
+        <td><button class="btn-row-del" onclick="deleteRow('service_fees','${r.id}')">🗑</button></td>
+      </tr>`;
+    }).join('');
+  } catch(e) { tbody.innerHTML=`<tr><td colspan="12" style="text-align:center;padding:40px;color:var(--muted)">${e.message}</td></tr>`; }
+}
+async function saveFee() {
+  const body = {
+    customer_id: val('fee_customer'), fee_year: +val('fee_year'), fee_month: +val('fee_month'),
+    accounting_fee: +val('fee_acct'), pp30_fee: +val('fee_pp30'), sps_fee: +val('fee_sps'),
+    social_ins_fee: +val('fee_socins'), pack_fee: +val('fee_pack'), other_fee: +val('fee_other'),
+    labor_cost: +val('fee_labor'), expense_cost: +val('fee_expense'),
+    inventory: +val('fee_inventory'), paid_date: val('fee_paid_date')||null,
+    paid_amount: +val('fee_paid_amt'), remark: val('fee_remark')
+  };
+  body.balance = (body.accounting_fee+body.pp30_fee+body.sps_fee+body.social_ins_fee+
+    body.pack_fee+body.other_fee+body.labor_cost+body.expense_cost)-body.paid_amount;
+  if (!body.customer_id) return showToast('กรุณาเลือกลูกค้า','err');
+  try { await sbInsert('service_fees',body); closeModal('modalAddFee'); showToast('บันทึกสำเร็จ','ok'); loadFeesTable(); }
+  catch(e) { showToast(e.message,'err'); }
+}
+
+// ── DELETE GENERIC ────────────────────────────────────────
+async function deleteRow(table, id) {
+  if (!confirm('ลบรายการนี้?')) return;
+  try {
+    await sbDelete(table, id); showToast('ลบสำเร็จ','ok');
+    loadWHTTable(); loadVATTable(); loadFeesTable(); loadTrackingTable();
+  } catch(e) { showToast(e.message,'err'); }
+}
+
+// ── POPULATE SELECTS ──────────────────────────────────────
+function populateSelects(customers) {
+  const ids = ['wht_customer','vat_customer','fee_customer',
+                'trackCustFilter','vatCustFilter','feesCustFilter'];
+  ids.forEach(id => {
+    const el = document.getElementById(id); if (!el) return;
+    const cur = el.value;
+    el.innerHTML = '<option value="">— เลือกลูกค้า —</option>' +
+      customers.map(c=>`<option value="${c.id}">${c.customer_code} — ${c.name.substring(0,24)}</option>`).join('');
+    el.value = cur;
+  });
+}
+
+// ── DASHBOARD STATS ───────────────────────────────────────
+async function updateDashStats(customers) {
+  document.getElementById('dashStatCust').textContent = customers.length;
+  try {
+    const wht = await sbSelect('withholding_tax','select=id');
+    document.getElementById('dashStatWHT').textContent = wht.length;
+  } catch { document.getElementById('dashStatWHT').textContent='—'; }
+  try {
+    const now = new Date();
+    const vat = await sbSelect('vat_pp30',`select=id&period_month=eq.${now.getMonth()+1}`);
+    document.getElementById('dashStatVAT').textContent = vat.length;
+  } catch { document.getElementById('dashStatVAT').textContent='—'; }
+  try {
+    const fees = await sbSelect('service_fees','select=balance&balance=gt.0');
+    document.getElementById('dashStatFees').textContent = fees.length;
+  } catch { document.getElementById('dashStatFees').textContent='—'; }
+}
+
+// ── SEARCH ────────────────────────────────────────────────
+document.getElementById('searchInput').addEventListener('input', function() {
+  const q = this.value.toLowerCase();
+  renderCustomerList(allCustomers.filter(c=>
+    c.customer_code.toLowerCase().includes(q) || c.name.toLowerCase().includes(q) || (c.tax_id||'').includes(q)
+  ));
+});
+
+document.querySelectorAll('.type-tab').forEach(tab => {
+  tab.addEventListener('click', function() {
+    document.querySelectorAll('.type-tab').forEach(t=>t.classList.remove('active'));
+    this.classList.add('active');
+    const type = this.dataset.type;
+    renderCustomerList(type ? allCustomers.filter(c=>c.customer_type===type) : allCustomers);
+  });
+});
+
+// ── CONFIG ────────────────────────────────────────────────
+document.getElementById('dbPill').addEventListener('click', () => {
+  document.getElementById('cfgUrl').value = SUPABASE_URL;
+  document.getElementById('cfgKey').value = SUPABASE_KEY;
+  openModal('modalConfig');
+});
+
+async function saveConfig() {
+  SUPABASE_URL = document.getElementById('cfgUrl').value.trim().replace(/\/$/,'');
+  SUPABASE_KEY = document.getElementById('cfgKey').value.trim();
+  localStorage.setItem('sa_url', SUPABASE_URL);
+  localStorage.setItem('sa_key', SUPABASE_KEY);
+  closeModal('modalConfig');
+  await initDashboard();
+}
+
+// ── INIT ──────────────────────────────────────────────────
+async function initDashboard() {
+  const dot   = document.getElementById('dbDot');
+  const label = document.getElementById('dbLabel');
+  if (!SUPABASE_URL || !SUPABASE_KEY) {
+    dot.className='db-dot'; label.textContent='ไม่ได้เชื่อมต่อ · ตั้งค่า DB';
+    document.getElementById('customerList').innerHTML =
+      '<div class="empty-state"><div class="icon">🔌</div><p>กรุณากด ตั้งค่า DB ด้านซ้ายล่าง แล้วใส่ Supabase URL + Key</p></div>';
+    return;
+  }
+  try {
+    const customers = await loadCustomers();
+    dot.className='db-dot on'; label.textContent=`เชื่อมต่อแล้ว · ${customers.length} ลูกค้า`;
+    renderCustomerList(customers);
+    populateSelects(customers);
+    await updateDashStats(customers);
+  } catch(e) {
+    dot.className='db-dot'; label.textContent='เชื่อมต่อล้มเหลว';
+    showToast('เชื่อมต่อ Supabase ล้มเหลว','err');
+  }
+}
+
+// ── HELPERS ───────────────────────────────────────────────
+function val(id) { const el=document.getElementById(id); return el?el.value:''; }
+
+function fmtN(n) {
+  const num = parseFloat(n)||0;
+  if (num===0) return '<span class="num-dash">—</span>';
+  return `<span class="num-val">${num.toLocaleString('th-TH',{minimumFractionDigits:2,maximumFractionDigits:2})}</span>`;
+}
+
+function fmtM(n) {
+  const num = parseFloat(n)||0;
+  if (num>=1e6) return (num/1e6).toFixed(2)+'M';
+  if (num>=1e3) return (num/1e3).toFixed(1)+'K';
+  return num.toFixed(2);
+}
+
+// ── START ─────────────────────────────────────────────────
+initDashboard();
+</script>
 </body>
 </html>
