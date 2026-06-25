@@ -535,13 +535,6 @@ body {
       </button>
     </div>
 
-    <div class="sidebar-section">
-      <div class="sidebar-label">การเงิน</div>
-      <button class="nav-item" data-section="fees">
-        <span class="nav-icon">💰</span> ค่าบริการ
-      </button>
-    </div>
-
     <div class="sidebar-footer">
       <div class="db-pill" id="dbPill" onclick="openModal('modalConfig')">
         <div class="db-dot" id="dbDot"></div>
@@ -590,17 +583,10 @@ body {
             <div class="dash-card-num" id="dashStatVAT">—</div>
             <div class="dash-card-label">ภ.พ.30 เดือนนี้</div>
           </div>
-          <div class="dash-card dc-coral">
-            <div class="dash-card-icon">⚠️</div>
-            <div class="dash-card-num" id="dashStatFees">—</div>
-            <div class="dash-card-label">ค่าบริการค้างชำระ</div>
-          </div>
-        </div>
 
         <div class="quick-actions">
           <button class="quick-btn qb-violet" onclick="goSection('wht')">🧾 บันทึกภาษีหัก ณ ที่จ่าย</button>
           <button class="quick-btn qb-teal"   onclick="goSection('vat')">📊 บันทึก ภ.พ.30</button>
-          <button class="quick-btn qb-green"  onclick="goSection('fees')">💰 บันทึกค่าบริการ</button>
           <button class="quick-btn" style="background:var(--indigo);color:#fff;" onclick="goSection('tracking')">📋 ติดตามเอกสาร</button>
         </div>
 
@@ -797,36 +783,7 @@ body {
       </section>
 
       <!-- ═══════════════ FEES ═══════════════ -->
-      <section class="section" id="sec-fees">
-        <div class="sec-header">
-          <h2>ค่าบริการ / การเงิน</h2>
-          <button class="btn-add" onclick="openModal('modalAddFee')">＋ เพิ่มรายการ</button>
-        </div>
-        <div class="filter-bar">
-          <div class="select-wrap"><select id="feesCustFilter"><option value="">— ลูกค้าทั้งหมด —</option></select></div>
-        </div>
-        <div class="table-card">
-          <div class="table-scroll">
-            <table class="data-table">
-              <thead><tr>
-                <th>ลูกค้า</th><th>ปี/เดือน</th>
-                <th class="num">ค่าทำบัญชี</th><th class="num">ภ.พ.30</th><th class="num">สปส</th>
-                <th class="num">ประกันสังคม</th><th class="num">ค่าแรง</th><th class="num">ค่าใช้จ่าย</th>
-                <th class="num">รวม</th><th class="num">ชำระ</th><th class="num">คงเหลือ</th><th></th>
-              </tr></thead>
-              <tbody id="tblFeesBody"><tr><td colspan="12" style="text-align:center;padding:40px;color:var(--muted)">ยังไม่มีข้อมูล</td></tr></tbody>
-            </table>
-          </div>
-        </div>
-      </section>
-
-
-      <!-- ═══════════════ WHT ANALYTICS ═══════════════ -->
-      <section class="section" id="sec-wht-analytics">
-        <div id="wht-analytics-content">
-          <!-- Will be rendered by JS -->
-        </div>
-      </section>
+      
     </div><!-- /page-body -->
   </div><!-- /main-area -->
 </div><!-- /layout -->
